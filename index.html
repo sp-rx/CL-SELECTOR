@@ -126,7 +126,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 </span>
 
 <span onclick="toggleSpan('promo')" style="text-decoration:underline; cursor:pointer; user-select:none">
-  Toggle Section
+  Show / Hide
 </span>
 
 
@@ -749,7 +749,7 @@ function openWhatsApp() {
 
 
 
-<div style="height:100px"></div>
+<div style="height:20px"></div>
 
 
 
@@ -761,15 +761,32 @@ function openWhatsApp() {
 
 
 <div id="targetSection">
-<div style="height:50px"></div>
+
+    <!-- Search -->
+    <div class="section" id="searchSec" style="padding:0 20px">
+      <div style="display:flex; gap:15px; margin-top:12px; align-items:flex-start; flex-wrap:wrap;">
+        <span><b>Search Anything: ( Tips: Search by RX by typing in this format: S-5.00 C-1.25 x180 )</span></b>
+      </div>
+      <div class="search-row">
+        <input style="border-radius:5px" type="text" id="searchRE" placeholder="Search Bar Right">
+        <input style="border-radius:5px" type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
+      </div>
+    </div>
+<div style="height:20px"></div>
 
 
 
 
 <div class="section">
-<div class="section3">
 
-<h3> Search Lenses Segment </h3>
+<h3>
+<button style="display:none" id="promoBtn" style="font-size:12px" disabled>Show Promo Only</button>
+<button id="showBtn" style="font-size:12px" disabled>Loading...</button>
+<span id="btnText" style="opacity:0.8;"></span>
+<button id="resetBtn" style="font-size:12px">Reset / Clear All</button>
+<button id="modeToggleBtn" style="font-size:12px">Switch to Professional Mode</button>
+
+</h3>
 
     <!-- Q1: Clear or Colour -->
     <div class="section" id="q1">
@@ -832,14 +849,6 @@ function openWhatsApp() {
         <label><input type="checkbox" name="q6" value="NOT_LOOSE">Boxes</label>
       </div>
     </div>
-
-    <div class="section2" style="text-align:center; margin-bottom:10px;">
-      <button id="modeToggleBtn" style="font-size:12px">Switch to Professional Mode</button>
-
-
-    </div>
-
-
 
 
 
@@ -909,27 +918,9 @@ function openWhatsApp() {
       </div>
     </div>
 
-    <!-- Search -->
-    <div class="section" id="searchSec">
-      <div style="display:flex; gap:15px; margin-top:12px; align-items:flex-start; flex-wrap:wrap;">
-        <span><b>Search Manually: *Hint*</b> Search Toric RX by typing in this format: S-5.00 C-1.25 x180</span>
-      </div>
-      <div class="search-row">
-        <input type="text" id="searchRE" placeholder="Search Bar Right">
-        <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
-      </div>
-    </div>
 
-    <!-- Action buttons -->
-    <div class="section" id="actionsSec">
-      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <button id="promoBtn" style="font-size:12px" disabled>Show Promo Only</button>
-        <div style="height:10px"></div>
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-          <button id="showBtn" style="font-size:12px" disabled>Loading...</button>
-          <span id="btnText" style="opacity:0.8;"></span>
-<button id="resetBtn" style="font-size:12px">Reset / Clear All</button>
-        </div>
+
+
 
 
     <!-- Sort bar + Results -->
@@ -947,7 +938,6 @@ function openWhatsApp() {
       </select>
     </div>
       </div>
-    </div>
 
 <div id="compareArea"></div>
 
@@ -957,7 +947,6 @@ function openWhatsApp() {
     </div>
 
 
-</div>
 </div>
 </div>
 </div>
