@@ -3,1077 +3,1261 @@
 <head>
 <meta charset="UTF-8" />
 <title>Contact Lens Selector</title>
-<meta name="viewport" content="width=device-width, initial-scale=1=" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-/* === Lightbox (shared) === */
-#imgZoom{position:fixed;inset:0;display:none;background:rgba(0,0,0,.75);align-items:center;justify-content:center;z-index:10000;cursor:zoom-out}
-#imgZoom.open{display:flex}
-#imgZoom .inner{position:relative}
-#imgZoom .hint{position:absolute;right:8px;bottom:-22px;color:#eee;font-size:11px;user-select:none}
-#zoomCardBox{display:none;max-width:920px;width:46vw;background:#ffffe0;border:1px solid #d7d7cf;border-radius:14px;padding:14px;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+/* ============================================================
+   DESIGN TOKENS
+============================================================ */
+:root {
+  --bg:           #f5f7fa;
+  --surface:      #ffffff;
+  --surface-alt:  #f0f4ff;
+  --surface-warm: #fffdf5;
+  --border:       rgba(30,60,120,0.10);
+  --border-strong:rgba(30,60,120,0.22);
+  --accent:       #1a4fa0;
+  --accent-lt:    #e8effd;
+  --accent2:      #0e7f6e;
+  --accent2-lt:   #e6f5f2;
+  --danger:       #c0392b;
+  --warning:      #e67e22;
+  --text:         #111827;
+  --text-mid:     #374151;
+  --text-muted:   #6b7280;
+  --text-faint:   #9ca3af;
+  --radius-sm:    8px;
+  --radius:       12px;
+  --radius-lg:    18px;
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.07);
+  --shadow:       0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg:    0 12px 40px rgba(0,0,0,0.14);
+  --font-body:    'DM Sans', sans-serif;
+  --font-display: 'Lora', Georgia, serif;
+}
 
-/* ========= Base ========= */
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;font-size:12px;line-height:1.3;margin:0;background:#f8f8f5;color:#0b3d2e}
-h1{font-size:18px;text-align:center;margin:10px 0 12px}
-h2{font-size:15px;margin:6px 0 8px}
+/* ============================================================
+   RESET & BASE
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+body {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.55;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
 
-/* ========= Layout ========= */
-.container{max-width:1100px;margin:0 auto;padding:40px}
-.wrap{width:100%;min-width:300px}
+/* Subtle grid pattern background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(26,79,160,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,79,160,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-/* ========= Sections ========= */
-.section{background:#ffffe0;border:1px solid #d7d7cf;border-radius:10px;padding:8px;margin:8px 0}
-.section2{background:#f5f5b5;border:1px solid #d7d7cf;border-radius:10px;padding:8px;margin:8px 0}
-.section3{background:#fff;border:1px solid #d7d7cf;border-radius:10px;padding:8px;margin:8px 0}
+/* ============================================================
+   OVERLAY
+============================================================ */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--surface);
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-family: var(--font-body);
+  z-index: 9999;
+  letter-spacing: 0.01em;
+}
 
-.lens-card{padding:12px;border:1px solid #d7d7cf;border-radius:10px;background:#ffffe0;box-shadow:0 1px 0 rgba(0,0,0,.04);transition:box-shadow .15s ease,transform .15s ease;cursor:pointer}
-.lens-card:hover{box-shadow:0 4px 10px rgba(0,0,0,.06);transform:translateY(-1px)}
+/* ============================================================
+   LAYOUT
+============================================================ */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
 
-.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px 12px}
-label{display:block}
-input[type="checkbox"]{margin-right:4px}
-input {font-size:10px}
-
-/* ========= Results ========= */
-.results{margin-top:12px}
-#sortBar{margin:8px 0;padding:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-#cardsGrid{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:10px}
-
-/* Compact card inner layout */
-.card-compact{display:flex;flex-direction:column;gap:6px}
-.card-compact .photo img{width:350px;max-width:100%;height:auto;border:1px solid #ccc;border-radius:10px;cursor:default}
-
-/* Expanded layout INSIDE LIGHTBOX */
-.zoom-card-flex{display:flex;flex-direction:column;gap:12px}
-.zoom-card-flex .photo img{width:700px;max-width:100%;height:auto;border:1px solid #ccc;border-radius:10px;cursor:default}
-.zoom-card-flex .details{display:flex;flex-direction:column;gap:8px}
-
-/* Promo ribbon */
-.promo-badge {
-  position: static !important;
-  margin-top: 8px;
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+.page-header {
   text-align: center;
-  background: #d60000;
+  padding: 48px 0 32px;
+}
+
+.page-header .eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.page-header h2 {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3.5vw, 30px);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.page-header h2 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.header-rule {
+  width: 48px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  margin: 16px auto 20px;
+  border-radius: 2px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   SECTION CARDS
+============================================================ */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin: 12px 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.section2 {
+  background: var(--surface-alt);
+  border: 1px solid rgba(26,79,160,0.13);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin: 12px 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.section3 {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin: 12px 0;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Section headings */
+h2 {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  text-align: center;
+  margin: 12px 0;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+/* ============================================================
+   CHECKBOXES & OPTIONS
+============================================================ */
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px 16px;
+}
+
+.options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-size: 12.5px;
+  color: var(--text-mid);
+}
+
+.options label:hover {
+  border-color: var(--accent);
+  background: var(--accent-lt);
+  color: var(--accent);
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* Checked label style */
+.options label:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-lt);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ============================================================
+   INPUTS
+============================================================ */
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(26,79,160,0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+  width: 90%;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+button {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--accent);
   color: #fff;
-  border-radius: 8px;
-  font-weight: 400;
-  display: inline-block;
-  padding: 3px 8px;
+  border: none;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+button:hover:not(:disabled) {
+  background: #153d85;
+  box-shadow: 0 2px 8px rgba(26,79,160,0.25);
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  background: var(--text-faint);
+  cursor: not-allowed;
+}
+
+/* Outlined / secondary buttons */
+button.btn-outline {
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+button.btn-outline:hover:not(:disabled) {
+  background: var(--accent-lt);
   box-shadow: none;
 }
 
+/* Soft yellow action button */
+button.btn-soft {
+  background: #fef9c3;
+  color: var(--text);
+  border: 1px solid #d97706;
+}
+button.btn-soft:hover:not(:disabled) {
+  background: #fde68a;
+  box-shadow: none;
+}
 
-/* Buttons */
-button{background:#0b3d2e;color:#fff;border:none;padding:6px 12px;border-radius:10px;cursor:pointer; font-size:10px}
-button:disabled{background:#999;cursor:not-allowed}
-button:hover:not(:disabled){background:#095c42}
+/* Danger */
+button.btn-danger {
+  background: var(--danger);
+}
+button.btn-danger:hover:not(:disabled) {
+  background: #96281b;
+}
 
-/* Search bars row */
-.search-row{display:flex;gap:4%;margin:12px 0}
-.search-row input{flex:1;padding:6px;font-size:10px}
+/* Green accent */
+button.btn-green {
+  background: var(--accent2);
+}
+button.btn-green:hover:not(:disabled) {
+  background: #0a6458;
+}
 
-/* 🔒 Overlay for blackout */
-#overlay{position:fixed;inset:0;background:#EDEADF;color:black;display:flex;align-items:center;justify-content:center;font-size:1.2rem;z-index:9999}
+/* ============================================================
+   SEARCH ROW
+============================================================ */
+.search-row {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0;
+}
 
-/* Checkboxes */
-input[type="checkbox"]{accent-color:#0b3d2e}
-input[type="checkbox"]:hover{filter:brightness(1.1)}
-input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
+.search-row input {
+  flex: 1;
+  padding: 9px 13px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  border: 1px solid var(--border-strong);
+}
 
-/* Pro mode */
-.simple-hide{display:none!important}
+/* ============================================================
+   SORT BAR
+============================================================ */
+#sortBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 14px 0 10px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  font-size: 12.5px;
+}
 
-/* Tap-to-expand term */
-.def-term{cursor:pointer;text-decoration:underline dotted}
-.def-row .def-extra{display:none;margin:6px 0 0 0;font-weight:400} /* long text NOT bold */
+#sortBar select {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
 
-/* RX icons row */
-.rx-icons{display:flex;gap:10px;align-items:center;margin-top:8px}
-.rx-icons img{max-height:auto;max-width:70%;border:1px solid #ccc;border-radius:6px;padding:2px;background:#fff}
+/* ============================================================
+   RESULT CARDS GRID
+============================================================ */
+#cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 14px;
+}
 
-/* Responsive */
-@media (max-width:900px){#cardsGrid{grid-template-columns:repeat(2,minmax(220px,1fr))}}
-@media (max-width:550px){#cardsGrid{grid-template-columns:1fr}}
+.lens-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+  box-shadow: var(--shadow-sm);
+}
 
+.lens-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
 
+.card-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
+.card-compact .photo img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: default;
+}
 
+/* ============================================================
+   PROMO BADGE
+============================================================ */
+.promo-badge {
+  display: inline-block;
+  margin-top: 8px;
+  background: var(--danger);
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   LIGHTBOX
+============================================================ */
+#imgZoom {
+  position: fixed;
+  inset: 0;
+  display: none;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  cursor: zoom-out;
+}
+
+#imgZoom.open { display: flex; }
+
+#imgZoom .inner {
+  position: relative;
+}
+
+#imgZoom .hint {
+  position: absolute;
+  right: 8px;
+  bottom: -26px;
+  color: rgba(255,255,255,0.7);
+  font-size: 11px;
+  user-select: none;
+  font-family: var(--font-body);
+}
+
+#zoomCardBox {
+  display: none;
+  max-width: 880px;
+  width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  cursor: default;
+}
+
+.zoom-card-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.zoom-card-flex .photo img {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: block;
+  margin: 0 auto;
+}
+
+.zoom-card-flex .details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.zoom-card-flex .details b {
+  color: var(--text-mid);
+  font-weight: 600;
+}
+
+/* ============================================================
+   WHATSAPP SECTION
+============================================================ */
+.wa-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.wa-section input[type="text"] {
+  width: 90%;
+  text-align: center;
+  padding: 9px 14px;
+  border-radius: var(--radius);
+}
+
+.wa-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#countryDisplay {
+  font-size: 12px;
+  color: var(--accent2);
+  font-weight: 500;
+}
+
+/* ============================================================
+   RX TABLE
+============================================================ */
+.rx-table {
+  width: 90%;
+  border-collapse: collapse;
+  margin: auto;
+  text-align: center;
+  font-size: 12px;
+}
+
+.rx-table thead tr {
+  background: var(--accent-lt);
+}
+
+.rx-table thead th {
+  padding: 10px 14px;
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.rx-table tbody tr:not(.spacer) {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+
+.rx-table td {
+  padding: 10px 12px;
+  border: none;
+}
+
+/* ============================================================
+   CONVERTER SECTION
+============================================================ */
+#clOut {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: var(--surface-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  font-size: 12.5px;
+}
+
+/* ============================================================
+   RX ICONS ROW
+============================================================ */
+.rx-icons {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.rx-icons label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-mid);
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+}
+
+.rx-icons img {
+  max-width: 100%;
+  width: auto;
+  max-height: 90px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 4px;
+}
+
+/* ============================================================
+   DEF TERMS
+============================================================ */
+.def-term {
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  color: var(--accent);
+}
+
+.def-row .def-extra {
+  display: none;
+  margin: 6px 0 0;
+  font-weight: 400;
+  color: var(--text-mid);
+  font-size: 12px;
+  background: var(--accent-lt);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+/* ============================================================
+   TOOLBAR / CONTROL BAR
+============================================================ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+/* ============================================================
+   COMPARE BOX
+============================================================ */
+#compareBox {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: var(--shadow);
+}
+
+#compareBox table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+#compareBox th,
+#compareBox td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+#compareBox th {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ============================================================
+   PROMO IMAGE SECTION
+============================================================ */
+.promo-images {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.promo-images img {
+  width: 90%;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+/* ============================================================
+   TOGGLE LINKS
+============================================================ */
+.toggle-link {
+  text-decoration: underline;
+  cursor: pointer;
+  user-select: none;
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   UTILITY
+============================================================ */
+.simple-hide { display: none !important; }
+
+.results { margin-top: 14px; }
+
+.text-center { text-align: center; }
+
+.badge-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.badge-section-label::before,
+.badge-section-label::after {
+  content: '';
+  height: 1px;
+  width: 24px;
+  background: var(--border-strong);
+  display: block;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 900px) {
+  #cardsGrid { grid-template-columns: repeat(2, minmax(200px, 1fr)); }
+}
+@media (max-width: 550px) {
+  #cardsGrid { grid-template-columns: 1fr; }
+  .container { padding: 0 12px 60px; }
+  .search-row { flex-direction: column; }
+  #zoomCardBox { padding: 16px; }
+}
 </style>
 </head>
 <body>
 
 <!-- 🔒 Locked screen -->
-<div style="font-size:10px" id="overlay">🔒 Entering password...</div>
+<div style="display:none; font-size: 13px;" id="overlay">🔒 Entering password...</div>
 
-
-
-
-
-<!-- Main content (hidden until password ok) -->
+<!-- Main content -->
 <div class="container" id="content" style="display:none;">
 
+  <div style="height: 80px"></div>
 
-
-<div style="height:200px"></div>
-  <h2 style="text-align:center">
-    Kiara Optometry Contact Lens Selector<br></h2>
-
-<div style="text-align:center">
-<span style="display:none; text-decoration:underline; cursor:pointer;"
-      onclick="document.getElementById('targetSection').scrollIntoView();">
-  Search Lenses Segment
-</span>
-
-<span onclick="toggleSpan('promo')" style="text-decoration:underline; cursor:pointer; user-select:none">
-  Show / Hide
-</span>
-
-
-</div>
-
-
-
-
-<div style="height:100px"></div>
-
-<div class="wrap">
-
-
-<div id="promo" style="display:none">
-<div class="section" style="display:flex; flex-direction:column; justify-content:center; align-items:center">
-
-
-<div class="section3" style="display:flex; flex-direction:column; justify-content:center; align-items:center; width:85%;">
-<h3 style="text-align:center">Current Promotions</h3>
-
-<div style="height:20px"></div>
-  <div style="display:flex; flex-direction:column; align-items:center; gap:10px; margin:0;">
-
-    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/acuvue_lens_promo.jpg"
-         style="width:90%; border-radius:5px;">
-
-    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/o1d.jpg"
-         style="width:90%; border-radius:5px;">
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="section">
-<div style="text-align:center; margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
-<h2>Send a whatsapp text   </h2>
-
-<div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;">
-
-  <!-- Name -->
-  <input id="waName" type="text"
-         placeholder="Enter name"
-         style="padding:6px; width:90%; border-radius:6px; border:1px solid #aaa; text-align:center;">
-
-  <!-- Number + Country Display -->
-  <div style="display:flex; flex-direction:column; align-items:center; gap:4px; width:100%;">
-    <input id="waNumber" type="text"
-           placeholder="Enter WHATSAPP number with country code (e.g. 601170199170)"
-           style="padding:6px; width:90%; border-radius:6px; border:1px solid #aaa; text-align:center;">
-    <span id="countryDisplay" style="font-size:13px; color:#0b3d2e;">Malaysia</span>
-
-</div>
-
-
-<div style="text-align:center; margin-top:20px;
-            display:flex; flex-direction:row; justify-content:center;
-            align-items:center; gap:10px;">
-
-    <button type="button" onclick="addPersonalPreset()">Greetings!</button>
-
-    <button type="button" onclick="undoMsg()">Undo Message</button>
-    <button type="button" onclick="redoMsg()">Redo Message</button>
-  <button onclick="openWhatsApp()" style="background: #f5f5b5; color:black; border: 1px solid black">
-    Open WhatsApp
-  </button>
-
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <p class="eyebrow">Kiara Optometry</p>
+    <h2>Contact Lens <em>Selector</em></h2>
+    <div class="header-rule"></div>
+    <div class="header-actions">
+      <span class="toggle-link" onclick="toggleSpan('promo')">Show / Hide Promotions</span>
+    </div>
   </div>
 
-  <!-- Message box -->
-  <textarea id="waMessage" rows="4"
-            placeholder="Type or select preset messages..."
-            style="width:90%; font-size:9px; padding:6px; height:20px; border-radius:6px; border:1px solid #aaa;"></textarea>
-<div style="height:10px"></div>
-
-<!-- Toggle button -->
-<div style="display:none; text-align:center; margin-top:10px;">
-  <button id="presetToggleBtn"
-          style="font-size:12px; color:black; background:#f5f5b5; border:1px solid #000;">
-    Show Presets
-  </button>
-</div>
-
-<!-- Buttons section (START HIDDEN) -->
-<div id="presetButtons" 
-     style="display:none; ">
-
-  <div style="display:flex; flex-wrap:wrap; justify-content:center; 
-              gap:8px; max-width:400px; margin-top:6px;">
-
-
-    <button type="button" onclick="addSet('A')">Vita Sph</button>
-    <button type="button" onclick="addSet('B')">Vita Astig</button>
-    <button type="button" onclick="addSet('C')">O2W Sph</button>
-    <button type="button" onclick="addSet('D')">O2W Astig</button>
-
-    <button type="button" onclick="addPreset('Thank you for placing the order! We will text you once the contact lenses are ready!')">
-      Place Order
-    </button>
-    <button type="button" onclick="totalUp()">Total Up</button>
-
-  </div>
-
-</div>
-
-
-<script>
-(function(){
-  const btn = document.getElementById("presetToggleBtn");
-  const box = document.getElementById("presetButtons");
-
-  let open = false; // start hidden
-
-  function render(){
-    box.style.display = open ? "block" : "none";
-    btn.textContent = open ? "Hide Place Order" : "Show Place Order";
-  }
-
-  btn.addEventListener("click", () => {
-    open = !open;
-    render();
-  });
-
-  render();
-})();
-</script>
-
-
-
-<!-- RX hide/show toggle -->
-<div style="display:none; text-align:center; margin:10px;">
-  <button type="button" id="rxSectionToggle"
-    style="font-size:12px;background:#f5f5b5;color:black;border:1px solid black;">
-    Hide RX
-  </button>
-</div>
-
-<!-- RX SECTION -->
-<div id="rxSection">
-  <div style="display:none; text-align:center; margin-bottom:10px">
-    <table style="width:90%; border:none; border-collapse:collapse; margin:auto; text-align:center; font-size:12px;">
-
-
-  <thead style="background:#d1d1d1;">
-    <tr>
-      <th style="padding:10px 20px; border:none;">Eye</th>
-      <th style="padding:10px 20px; border:none;">SPH</th>
-      <th style="padding:10px 20px; border:none;">CYL</th>
-      <th style="padding:10px 20px; border:none;">AXIS</th>
-    </tr>
-  </thead>
-  <tbody>
-<tr style="height:5px"><td></td>
-</tr>
-    <tr style="background:#f5f5f5">
-      <td style="padding:12px 20px; font-weight:400; border:none;">Right (R)</td>
-
-      <td style="padding:12px; border:none;">
-        <input id="rSph" type="number" step="0.25" value="0.00"
-               style="width:120px; text-align:center; margin-bottom:12px;"><br>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('r','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
-            <button onclick="adjustSingle('r','sph',+1)" style="background:black; color:white;">+1.00</button>
-          </div>
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('r','sph',-0.25)" style="background:#c62828; color:white;">−0.25</button>
-            <button onclick="adjustSingle('r','sph',+0.25)" style="background:black; color:white;">+0.25</button>
-          </div>
+  <!-- PROMO SECTION -->
+  <div id="promo" style="display:none">
+    <div class="section" style="display:flex; flex-direction:column; justify-content:center; align-items:center">
+      <div class="section3" style="width:90%">
+        <h3 class="text-center" style="margin-bottom:16px;">Current Promotions</h3>
+        <div class="promo-images">
+          <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/acuvue_lens_promo.jpg" alt="Promo">
+          <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/o1d.jpg" alt="Promo 2">
         </div>
-      </td>
-
-      <td style="padding:12px; border:none;">
-        <input id="rCyl" type="number" step="0.25" value="0.00"
-               style="width:120px; text-align:center; margin-bottom:12px;"><br>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('r','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
-            <button onclick="adjustSingle('r','cyl',+1)" style="background:black; color:white;">+1.00</button>
-          </div>
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('r','cyl',-0.25)" style="background:#c62828; color:white;">−0.25</button>
-            <button onclick="adjustSingle('r','cyl',+0.25)" style="background:black; color:white;">+0.25</button>
-          </div>
-        </div>
-      </td>
-
-      <td style="padding:12px; border:none;">
-        <input id="rAxis" type="number" step="1" value="0"
-               style="width:120px; text-align:center; margin-bottom:12px;"><br>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('r','axis',-20)" style="background:#c62828; color:white;">−20°</button>
-            <button onclick="adjustSingle('r','axis',+20)" style="background:black; color:white;">+20°</button>
-          </div>
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('r','axis',-5)" style="background:#c62828; color:white;">−5°</button>
-            <button onclick="adjustSingle('r','axis',+5)" style="background:black; color:white;">+5°</button>
-          </div>
-        </div>
-      </td>
-    </tr>
-<tr style="height:5px"><td></td>
-</tr>
-    <tr style="background:#f5f5f5">
-      <td style="padding:12px 20px; font-weight:400; border:none;">Left (L)</td>
-
-      <td style="padding:12px; border:none;">
-        <input id="lSph" type="number" step="0.25" value="0.00"
-               style="width:120px; text-align:center; margin-bottom:12px;"><br>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('l','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
-            <button onclick="adjustSingle('l','sph',+1)" style="background:black; color:white;">+1.00</button>
-          </div>
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('l','sph',-0.25)" style="background:#c62828; color:white;">−0.25</button>
-            <button onclick="adjustSingle('l','sph',+0.25)" style="background:black; color:white;">+0.25</button>
-          </div>
-        </div>
-      </td>
-
-      <td style="padding:12px; border:none;">
-        <input id="lCyl" type="number" step="0.25" value="0.00"
-               style="width:120px; text-align:center; margin-bottom:12px;"><br>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('l','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
-            <button onclick="adjustSingle('l','cyl',+1)" style="background:black; color:white;">+1.00</button>
-          </div>
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('l','cyl',-0.25)" style="background:#c62828; color:white;">−0.25</button>
-            <button onclick="adjustSingle('l','cyl',+0.25)" style="background:black; color:white;">+0.25</button>
-          </div>
-        </div>
-      </td>
-
-      <td style="padding:12px; border:none;">
-        <input id="lAxis" type="number" step="1" value="0"
-               style="width:120px; text-align:center; margin-bottom:12px;"><br>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('l','axis',-20)" style="background:#c62828; color:white;">−20°</button>
-            <button onclick="adjustSingle('l','axis',+20)" style="background:black; color:white;">+20°</button>
-          </div>
-          <div style="display:flex; gap:12px;">
-            <button onclick="adjustSingle('l','axis',-5)" style="background:#c62828; color:white;">−5°</button>
-            <button onclick="adjustSingle('l','axis',+5)" style="background:black; color:white;">+5°</button>
-          </div>
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-  <div style="margin-top:20px;">
-    <button type="button" onclick="addRxToMessage()">
-      Add RX to Message
-    </button>
-
-  <button type="button" onclick="clearRx()">
-    Clear RX
-  </button>
-
-</div>
-</div>
-
-<script>
-(function(){
-  const btn = document.getElementById("rxSectionToggle");
-  const sec = document.getElementById("rxSection");
-  if(!btn || !sec) return;
-
-  let open =  false;
-
-  function render(){
-    sec.style.display = open ? "block" : "none";
-    btn.textContent = open ? "Hide RX Input Table" : "Show RX Input Table";
-  }
-
-  btn.addEventListener("click", () => {
-    open = !open;
-    render();
-  });
-
-  render();
-})();
-</script>
-
-
-<script>
-function adjustSingle(eye, type, value) {
-  const id = eye + type.charAt(0).toUpperCase() + type.slice(1);
-  const field = document.getElementById(id);
-
-  if (type === "axis") {
-    let newVal = parseInt(field.value) + value;
-    if (newVal <= 0) newVal += 180;
-    if (newVal > 180) newVal -= 180;
-    field.value = newVal === 0 ? 180 : newVal;
-  } else {
-    const newVal = (parseFloat(field.value) + value).toFixed(2);
-    field.value = newVal;
-  }
-}
-
-function addRxToMessage() {
-  const rSph = parseFloat(document.getElementById("rSph").value).toFixed(2);
-  const rCylVal = parseFloat(document.getElementById("rCyl").value).toFixed(2);
-  const lSph = parseFloat(document.getElementById("lSph").value).toFixed(2);
-  const lCylVal = parseFloat(document.getElementById("lCyl").value).toFixed(2);
-
-  let rAxis = parseInt(document.getElementById("rAxis").value);
-  let lAxis = parseInt(document.getElementById("lAxis").value);
-
-  if (rCylVal == 0) {
-    rAxis = "-";
-  } else if (rAxis === 0) {
-    rAxis = 180;
-  }
-
-  if (lCylVal == 0) {
-    lAxis = "-";
-  } else if (lAxis === 0) {
-    lAxis = 180;
-  }
-
-  const rCyl = rCylVal == 0 ? "-" : rCylVal;
-  const lCyl = lCylVal == 0 ? "-" : lCylVal;
-
-  const rxText =
-    `R :  ${rSph} /  ${rCyl} × ${rAxis}\n` +
-    `L :  ${lSph} /  ${lCyl} × ${lAxis}`;
-
-  addPreset(rxText);
-}
-
-function clearRx() {
-  const fields = ["rSph", "rCyl", "rAxis", "lSph", "lCyl", "lAxis"];
-  fields.forEach(id => document.getElementById(id).value = id.includes("Axis") ? 0 : "0.00");
-}
-
-
-</script>
-
-
-
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const numberInput = document.getElementById("waNumber");
-  numberInput.addEventListener("input", updateCountryDisplay);
-});
-
-let history = [];
-let redoStack = [];
-
-/* === Undo / Redo Management === */
-function saveState() {
-  const msg = document.getElementById("waMessage").value;
-  history.push(msg);
-  if (history.length > 30) history.shift();
-  redoStack = [];
-}
-
-function addPreset(text) {
-  const box = document.getElementById("waMessage");
-  let current = box.value.trim();
-
-  saveState();
-
-  // Adds each preset on a new paragraph
-  if (!current) {
-    box.value = text;
-  } else {
-    box.value = `${current}\n\n${text}`;
-  }
-}
-
-// ✅ Separate function, not inside addPreset
-function addPersonalPreset() {
-  const nameInput = document.getElementById("waName").value.trim();
-  const name = capitalizeName(nameInput) || "there";
-  const message = `Greetings from Kiara Optometry! Thank you for dropping by ${name}.`;
-
-  addPreset(message);
-}
-
-
-
-function addSet(setName) {
-  const sets = {
-    A: { label: "Set A - Vita Monthly Sph + 1 bottle Opti-free Puremoist 300ml", price: 190 },
-    B: { label: "Set B - Vita Monthly Astig + 1 bottle Opti-free Puremoist 300ml", price: 220 },
-    C: { label: "Set C - Oasys Biweekly Sph + 1 bottle Opti-free Puremoist 300ml", price: 280 },
-    D: { label: "Set D - Oasys Biweekly Astig + 1 bottle Opti-free Puremoist 300ml", price: 350 }
-  };
-
-  const box = document.getElementById("waMessage");
-  const current = box.value.trim();
-  const set = sets[setName];
-  if (!set) return;
-
-  const newLine = current ? "\n" : "";
-  box.value = `${current}${newLine}${set.label} - RM${set.price}`;
-}
-
-
-
-// --- Total Up (only show Grand Total) ---
-function totalUp() {
-  const box = document.getElementById("waMessage");
-  const text = box.value;
-
-  const prices = { A: 190, B: 220, C: 280, D: 350 };
-  const matches = text.match(/Set ([A-D])/g) || [];
-
-  let grandTotal = 0;
-  matches.forEach(m => {
-    const set = m.split(" ")[1];
-    if (prices[set]) grandTotal += prices[set];
-  });
-
-  if (grandTotal > 0) {
-    addPreset(`Grand Total: RM ${grandTotal}`);
-  } else {
-    alert("No sets selected yet.");
-  }
-}
-
-
-
-function undoMsg() {
-  if (history.length === 0) return;
-  const box = document.getElementById("waMessage");
-  redoStack.push(box.value);
-  box.value = history.pop() || "";
-}
-
-function redoMsg() {
-  if (redoStack.length === 0) return;
-  const box = document.getElementById("waMessage");
-  history.push(box.value);
-  box.value = redoStack.pop();
-}
-
-/* === Name Formatting === */
-function capitalizeName(name) {
-  name = name.trim();
-  if (!name) return "";
-  return name
-    .split(/\s+/) // split by spaces
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(" ");
-}
-
-
-/* === Country Flag & Name Display === */
-document.addEventListener("DOMContentLoaded", () => {
-  const numberInput = document.getElementById("waNumber");
-  numberInput.addEventListener("input", updateCountryDisplay);
-});
-
-/* === Country Flag & Name Display === */
-function detectCountry(num) {
-  const countries = [
-    // --- SE Asia ---
-{ code: "60", name: "Malaysia" },
-{ code: "65", name: "Singapore" },
-{ code: "62", name: "Indonesia" },
-{ code: "63", name: "Philippines" },
-{ code: "66", name: "Thailand" },
-{ code: "84", name: "Vietnam" },
-{ code: "673", name: "Brunei" },
-{ code: "95", name: "Myanmar" },
-{ code: "856", name: "Laos" },
-
-// --- East Asia ---
-{ code: "81", name: "Japan" },
-{ code: "82", name: "South Korea" },
-{ code: "86", name: "China" },
-{ code: "852", name: "Hong Kong" },
-{ code: "853", name: "Macau" },
-{ code: "886", name: "Taiwan" },
-
-// --- South Asia ---
-{ code: "91", name: "India" },
-{ code: "92", name: "Pakistan" },
-{ code: "94", name: "Sri Lanka" },
-{ code: "880", name: "Bangladesh" },
-{ code: "977", name: "Nepal" },
-
-// --- Oceania ---
-{ code: "61", name: "Australia" },
-{ code: "64", name: "New Zealand" },
-{ code: "687", name: "New Caledonia" },
-
-// --- Middle East ---
-{ code: "971", name: "UAE" },
-{ code: "966", name: "Saudi Arabia" },
-{ code: "965", name: "Kuwait" },
-{ code: "968", name: "Oman" },
-{ code: "973", name: "Bahrain" },
-{ code: "974", name: "Qatar" },
-{ code: "962", name: "Jordan" },
-
-// --- Africa ---
-{ code: "27", name: "South Africa" },
-{ code: "234", name: "Nigeria" },
-{ code: "254", name: "Kenya" },
-{ code: "255", name: "Tanzania" },
-{ code: "256", name: "Uganda" },
-{ code: "263", name: "Zimbabwe" },
-{ code: "20", name: "Egypt" },
-
-// --- Europe ---
-{ code: "44", name: "United Kingdom" },
-{ code: "33", name: "France" },
-{ code: "49", name: "Germany" },
-{ code: "34", name: "Spain" },
-{ code: "39", name: "Italy" },
-{ code: "31", name: "Netherlands" },
-{ code: "32", name: "Belgium" },
-{ code: "36", name: "Hungary" },
-{ code: "43", name: "Austria" },
-{ code: "41", name: "Switzerland" },
-{ code: "46", name: "Sweden" },
-{ code: "47", name: "Norway" },
-{ code: "45", name: "Denmark" },
-{ code: "351", name: "Portugal" },
-{ code: "420", name: "Czech Republic" },
-{ code: "421", name: "Slovakia" },
-{ code: "48", name: "Poland" },
-{ code: "358", name: "Finland" },
-{ code: "40", name: "Romania" },
-{ code: "30", name: "Greece" },
-{ code: "385", name: "Croatia" },
-{ code: "386", name: "Slovenia" },
-{ code: "372", name: "Estonia" },
-{ code: "371", name: "Latvia" },
-{ code: "370", name: "Lithuania" },
-{ code: "353", name: "Ireland" },
-
-// --- Americas ---
-{ code: "1", name: "United States / Canada" },
-{ code: "55", name: "Brazil" },
-{ code: "54", name: "Argentina" },
-{ code: "57", name: "Colombia" },
-{ code: "51", name: "Peru" },
-{ code: "56", name: "Chile" },
-{ code: "58", name: "Venezuela" }
-
-  ];
-
-  num = num.trim().replace(/[^\d+]/g, "");
-  if (num.startsWith("+")) num = num.slice(1);
-
-
-  let match = countries.find(c => num.startsWith(c.code));
-  if (!num) return { flag: "🌍", name: "Enter number" };
-  return match || { flag: "🌍", name: "Unknown Country" };
-}
-
-function updateCountryDisplay() {
-  const num = document.getElementById("waNumber").value;
-  const info = detectCountry(num);
-  const display = document.getElementById("countryDisplay");
-  display.textContent = info.name; 
-}
-
-function formatPhone(num) {
-  num = num.trim();
-
-  // If starts with +, remove it BEFORE stripping non-digits
-  if (num.startsWith("+")) num = num.slice(1);
-
-  // Remove everything except digits
-  num = num.replace(/[^\d]/g, "");
-
-  // If user types 0xxxx... → treat as Malaysia
-  if (num.startsWith("0")) {
-    return "6" + num;  // 017 → 6017
-  }
-
-  // If starts with 60 → already Malaysia
-  if (num.startsWith("60")) {
-    return num;
-  }
-
-  // Otherwise foreign number → leave as is
-  return num;
-}
-
-
-
-
-/* === WhatsApp Link Builder === */
-function openWhatsApp() {
-  let name = document.getElementById("waName").value.trim();
-  let num = document.getElementById("waNumber").value.trim();
-  const msg = document.getElementById("waMessage").value.trim();
-
-  if (!num) return alert("Please enter a phone number");
-
-  name = capitalizeName(name);
-  document.getElementById("waName").value = name;
-
-  num = formatPhone(num);
-  document.getElementById("waNumber").value = num;
-
-  const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
-  window.open(url, "_blank");
-}
-
-</script>
-</div>
-</div>
-</div>
-
-
-
-<div style="height:20px"></div>
-
-
-
-
-
-
-
-
-
-
-<div id="targetSection">
-
-    <!-- Search -->
-    <div class="section" id="searchSec" style="padding:0 20px">
-      <div style="display:flex; gap:15px; margin-top:12px; align-items:flex-start; flex-wrap:wrap;">
-        <span><b>Search Anything: ( Tips: Search by RX by typing in this format: S-5.00 C-1.25 x180 )</span></b>
       </div>
+    </div>
+  </div>
+
+  <!-- WHATSAPP SECTION -->
+  <div class="section">
+    <div class="badge-section-label"><span>WhatsApp Messaging</span></div>
+    <div class="wa-section">
+      <input id="waName" type="text" placeholder="Enter patient name" style="width:90%; text-align:center; border-radius:8px;">
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px; width:100%;">
+        <input id="waNumber" type="text" placeholder="WhatsApp number with country code (e.g. 601170199170)" style="width:90%; text-align:center; border-radius:8px;">
+        <span id="countryDisplay">Malaysia</span>
+      </div>
+
+      <div class="wa-row">
+        <button onclick="addPersonalPreset()">👋 Greetings</button>
+        <button class="btn-outline" onclick="undoMsg()">↩ Undo</button>
+        <button class="btn-outline" onclick="redoMsg()">↪ Redo</button>
+        <button class="btn-soft" onclick="openWhatsApp()">Open WhatsApp ↗</button>
+      </div>
+
+      <textarea id="waMessage" rows="4" placeholder="Type or select preset messages..." style="width:90%; height:80px;"></textarea>
+
+      <!-- Preset toggle -->
+      <div style="text-align:center;">
+        <button id="presetToggleBtn" class="btn-outline">Show Presets</button>
+      </div>
+
+      <div id="presetButtons" style="display:none;">
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; max-width:480px; margin-top:6px;">
+          <button onclick="addSet('A')">Set A – Vita Sph</button>
+          <button onclick="addSet('B')">Set B – Vita Astig</button>
+          <button onclick="addSet('C')">Set C – O2W Sph</button>
+          <button onclick="addSet('D')">Set D – O2W Astig</button>
+          <button onclick="addPreset('Thank you for placing the order! We will text you once the contact lenses are ready!')">Place Order</button>
+          <button class="btn-green" onclick="totalUp()">Total Up</button>
+        </div>
+      </div>
+
+      <script>
+      (function(){
+        const btn = document.getElementById("presetToggleBtn");
+        const box = document.getElementById("presetButtons");
+        let open = false;
+        function render(){
+          box.style.display = open ? "block" : "none";
+          btn.textContent = open ? "Hide Presets" : "Show Presets";
+        }
+        btn.addEventListener("click", () => { open = !open; render(); });
+        render();
+      })();
+      </script>
+
+      <!-- RX toggle -->
+      <div style="text-align:center;">
+        <button type="button" id="rxSectionToggle" class="btn-outline">Show RX Input Table</button>
+      </div>
+
+      <!-- RX SECTION -->
+      <div id="rxSection">
+        <div style="display:none; text-align:center; margin-bottom:12px;">
+          <table class="rx-table">
+            <thead>
+              <tr>
+                <th>Eye</th>
+                <th>SPH</th>
+                <th>CYL</th>
+                <th>AXIS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="spacer"><td style="height:6px"></td></tr>
+              <tr>
+                <td style="font-weight:600; color:var(--text-mid);">Right (R)</td>
+                <td>
+                  <input id="rSph" type="number" step="0.25" value="0.00" style="width:90px; text-align:center; margin-bottom:10px;"><br>
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('r','sph',-1)" class="btn-danger">−1.00</button>
+                      <button onclick="adjustSingle('r','sph',+1)">+1.00</button>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('r','sph',-0.25)" class="btn-danger">−0.25</button>
+                      <button onclick="adjustSingle('r','sph',+0.25)">+0.25</button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <input id="rCyl" type="number" step="0.25" value="0.00" style="width:90px; text-align:center; margin-bottom:10px;"><br>
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('r','cyl',-1)" class="btn-danger">−1.00</button>
+                      <button onclick="adjustSingle('r','cyl',+1)">+1.00</button>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('r','cyl',-0.25)" class="btn-danger">−0.25</button>
+                      <button onclick="adjustSingle('r','cyl',+0.25)">+0.25</button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <input id="rAxis" type="number" step="1" value="0" style="width:90px; text-align:center; margin-bottom:10px;"><br>
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('r','axis',-20)" class="btn-danger">−20°</button>
+                      <button onclick="adjustSingle('r','axis',+20)">+20°</button>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('r','axis',-5)" class="btn-danger">−5°</button>
+                      <button onclick="adjustSingle('r','axis',+5)">+5°</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr class="spacer"><td style="height:6px"></td></tr>
+              <tr>
+                <td style="font-weight:600; color:var(--text-mid);">Left (L)</td>
+                <td>
+                  <input id="lSph" type="number" step="0.25" value="0.00" style="width:90px; text-align:center; margin-bottom:10px;"><br>
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('l','sph',-1)" class="btn-danger">−1.00</button>
+                      <button onclick="adjustSingle('l','sph',+1)">+1.00</button>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('l','sph',-0.25)" class="btn-danger">−0.25</button>
+                      <button onclick="adjustSingle('l','sph',+0.25)">+0.25</button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <input id="lCyl" type="number" step="0.25" value="0.00" style="width:90px; text-align:center; margin-bottom:10px;"><br>
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('l','cyl',-1)" class="btn-danger">−1.00</button>
+                      <button onclick="adjustSingle('l','cyl',+1)">+1.00</button>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('l','cyl',-0.25)" class="btn-danger">−0.25</button>
+                      <button onclick="adjustSingle('l','cyl',+0.25)">+0.25</button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <input id="lAxis" type="number" step="1" value="0" style="width:90px; text-align:center; margin-bottom:10px;"><br>
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('l','axis',-20)" class="btn-danger">−20°</button>
+                      <button onclick="adjustSingle('l','axis',+20)">+20°</button>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                      <button onclick="adjustSingle('l','axis',-5)" class="btn-danger">−5°</button>
+                      <button onclick="adjustSingle('l','axis',+5)">+5°</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px; display:flex; gap:8px; justify-content:center;">
+            <button onclick="addRxToMessage()">Add RX to Message</button>
+            <button class="btn-outline" onclick="clearRx()">Clear RX</button>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      (function(){
+        const btn = document.getElementById("rxSectionToggle");
+        const sec = document.getElementById("rxSection");
+        if(!btn || !sec) return;
+        let open = false;
+        function render(){
+          sec.style.display = open ? "block" : "none";
+          btn.textContent = open ? "Hide RX Input Table" : "Show RX Input Table";
+        }
+        btn.addEventListener("click", () => { open = !open; render(); });
+        render();
+      })();
+      </script>
+
+    </div><!-- end wa-section -->
+  </div><!-- end section -->
+
+  <div style="height:24px"></div>
+
+  <!-- SEARCH SECTION -->
+  <div id="targetSection">
+
+    <div class="section" id="searchSec">
+      <div class="badge-section-label"><span>Lens Search</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
+        <strong>Tip:</strong> Search by RX using format: <code style="background:var(--accent-lt); color:var(--accent); padding:1px 5px; border-radius:4px;">S-5.00 C-1.25 x180</code>
+      </p>
       <div class="search-row">
-        <input style="border-radius:5px" type="text" id="searchRE" placeholder="Search Bar Right">
-        <input style="border-radius:5px" type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
-      </div>
-    </div>
-<div style="height:20px"></div>
-
-
-
-
-<div class="section">
-
-<h3>
-<button style="display:none" id="promoBtn" style="font-size:12px" disabled>Show Promo Only</button>
-<button id="showBtn" style="font-size:12px" disabled>Loading...</button>
-<span id="btnText" style="opacity:0.8;"></span>
-<button id="resetBtn" style="font-size:12px">Reset / Clear All</button>
-<button id="modeToggleBtn" style="font-size:12px">Switch to Professional Mode</button>
-
-</h3>
-
-    <!-- Q1: Clear or Colour -->
-    <div class="section" id="q1">
-      <h2>Clear or coloured lenses?</h2>
-      <div class="options">
-        <label><input type="checkbox" name="q1" value="CLEAR">Clear</label>
-        <label><input type="checkbox" name="q1" value="COLOUR">Colour</label>
+        <input type="text" id="searchRE" placeholder="🔍 Search Right Eye">
+        <input type="text" id="searchLE" placeholder="🔍 Search Left Eye (if needed)">
       </div>
     </div>
 
-    <!-- Q2: Modality -->
-    <div class="section" id="q2">
-      <h2>What type of disposable?</h2>
-      <div class="options">
-        <label><input type="checkbox" name="q2" value="1 Day">1 Day</label>
-        <label><input type="checkbox" name="q2" value="2 Weeks">2 Weeks</label>
-        <label><input type="checkbox" name="q2" value="1 Month">1 Month</label>
-        <label><input type="checkbox" name="q2" value="3 Months">3 Months</label>
+    <div style="height:12px"></div>
+
+    <div class="section">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <button id="promoBtn" style="display:none;" disabled>Show Promo Only</button>
+        <button id="showBtn" disabled>Loading…</button>
+        <span id="btnText" style="opacity:0.6; font-size:12px;"></span>
+        <button id="resetBtn" class="btn-outline">↺ Reset</button>
+        <button id="modeToggleBtn" class="btn-soft">Switch to Professional Mode</button>
       </div>
-    </div>
 
-    <!-- Q3: Vision (+ RX icons toggle) -->
-    <div class="section" id="q3">
-      <h2>What type of prescription (RX)? <span id="rxToggleBtn" style="user-select:none; font-size:12px"><u>See examples of types of RX</u> </span></h2>
-      <div style="margin-top:8px;">
-
-      <div id="rxIcons" class="rx-icons" style="display:none;">
-<label>
-  <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/SPH.png" alt="SPH"><br><br>
-  SPH lenses only have one prescription, e.g. -5.00 which is indicated by D.
-</label>
-
-<label>
-  <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/ASTIG.png" alt="ASTIG"><br><br>
-  ASTIG lenses have 2 extra prescription, e.g. -1.75 and 030.
-</label>
-
-<label>
-  <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/MF.png" alt="MF"><br><br>
-  MF lenses have ADD prescription, e.g. MID (or LOW or HI).
-</label>
-
-
-      </div>
-</div>
-      <div style="margin-top:8px;"></div>
-
-      <div class="options">
-        <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
-        <label><input type="checkbox" name="q3" value="ASTIG">With Astigmatism (ASTIG)</label>
-        <label><input type="checkbox" name="q3" value="MF">Multi-focal (MF)</label>
-      </div>
-    </div>
-
-    <!-- Q6: Packing -->
-    <div class="section" id="q6">
-      <h2>Types of Packing?</h2>
-      <div class="options">
-        <label><input type="checkbox" name="q6" value="LOOSE">Travel Packs</label>
-        <label><input type="checkbox" name="q6" value="NOT_LOOSE">Boxes</label>
-      </div>
-    </div>
-
-
-
-    <!-- Q4: Comfort -->
-    <div class="section2" id="q4">
-      <h2>Comfort level?</h2>
-      <div class="options">
-        <label><input type="checkbox" name="q4" value="BASIC">Basic</label>
-        <label><input type="checkbox" name="q4" value="GOOD">Good</label>
-        <label><input type="checkbox" name="q4" value="PREMIUM">Premium</label>
-      </div>
-    </div>
-
-    <!-- Q5: Material -->
-    <div class="section2" id="q5">
-      <h2>Material type?</h2>
-      <div class="options">
-        <label><input type="checkbox" name="q5" value="HYDROGEL">Hydrogel (Standard Oxygen)</label>
-        <label><input type="checkbox" name="q5" value="SILICONE HYDROGEL">Silicone Hydrogel (High Oxygen)</label>
-      </div>
-    </div>
-
-    <!-- Converter (Pro mode can hide/show) -->
-    <div class="section2" id="specToCL">
-      <h2>Spectacle → Contact Lens Power Converter</h2>
-
-      <!-- Input Row -->
-      <div style="display:flex; align-items:flex-end; flex-wrap:wrap; gap:10px;">
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <b>RE Specs :</b>
-          Sph <input id="sph-re" type="number" step="0.25" style="width:70px;text-align:center">
-          Cyl <input id="cyl-re" type="number" step="0.25" style="width:70px;text-align:center">
-          Axis <input id="axis-re" type="number" min="0" max="180" step="1" style="width:70px;text-align:center">
+      <!-- Q1 -->
+      <div class="section" id="q1">
+        <h2>Clear or coloured lenses?</h2>
+        <div class="options">
+          <label><input type="checkbox" name="q1" value="CLEAR"> Clear</label>
+          <label><input type="checkbox" name="q1" value="COLOUR"> Colour</label>
         </div>
-
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <b>LE Specs :</b>
-          Sph <input id="sph-le" type="number" step="0.25" style="width:70px;text-align:center">
-          Cyl <input id="cyl-le" type="number" step="0.25" style="width:70px;text-align:center">
-          Axis <input id="axis-le" type="number" min="0" max="180" step="1" style="width:70px;text-align:center">
-        </div>
-
-        <button id="convertBtn">Convert</button>
       </div>
 
-      <!-- Results + Auto-fill Panel -->
-      <div style="display:flex; gap:15px; margin-top:12px; align-items:flex-start; flex-wrap:wrap;">
-        <div id="clOut" class="lens-card"
-            style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:10px;
-                    background:#fffff0; border:1px solid #ccc; border-radius:10px; padding:12px;">
-          <div>
-            <div style="font-weight:700;margin-bottom:6px;">RE Results</div>
-            <div id="reResult"></div>
+      <!-- Q2 -->
+      <div class="section" id="q2">
+        <h2>What type of disposable?</h2>
+        <div class="options">
+          <label><input type="checkbox" name="q2" value="1 Day"> 1 Day</label>
+          <label><input type="checkbox" name="q2" value="2 Weeks"> 2 Weeks</label>
+          <label><input type="checkbox" name="q2" value="1 Month"> 1 Month</label>
+          <label><input type="checkbox" name="q2" value="3 Months"> 3 Months</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section" id="q3">
+        <h2>What type of prescription (RX)?
+          <span id="rxToggleBtn" class="toggle-link" style="font-weight:400; font-size:11.5px; margin-left:8px;">See examples of RX types</span>
+        </h2>
+        <div id="rxIcons" class="rx-icons" style="display:none;">
+          <label>
+            <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/SPH.png" alt="SPH">
+            SPH lenses only have one prescription, e.g. −5.00 (indicated by D).
+          </label>
+          <label>
+            <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/ASTIG.png" alt="ASTIG">
+            ASTIG lenses have 2 extra prescriptions, e.g. −1.75 and 030.
+          </label>
+          <label>
+            <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/MF.png" alt="MF">
+            MF lenses have an ADD prescription, e.g. MID (LOW or HI).
+          </label>
+        </div>
+        <div style="margin-top:10px;"></div>
+        <div class="options">
+          <label><input type="checkbox" name="q3" value="SPH"> Short or Far Sighted (SPH)</label>
+          <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
+          <label><input type="checkbox" name="q3" value="MF"> Multi-focal (MF)</label>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="section" id="q6">
+        <h2>Types of Packing?</h2>
+        <div class="options">
+          <label><input type="checkbox" name="q6" value="LOOSE"> Travel Packs</label>
+          <label><input type="checkbox" name="q6" value="NOT_LOOSE"> Boxes</label>
+        </div>
+      </div>
+
+      <!-- Q4 (pro) -->
+      <div class="section2 simple-hide" id="q4">
+        <h2>Comfort level?</h2>
+        <div class="options">
+          <label><input type="checkbox" name="q4" value="BASIC"> Basic</label>
+          <label><input type="checkbox" name="q4" value="GOOD"> Good</label>
+          <label><input type="checkbox" name="q4" value="PREMIUM"> Premium</label>
+        </div>
+      </div>
+
+      <!-- Q5 (pro) -->
+      <div class="section2 simple-hide" id="q5">
+        <h2>Material type?</h2>
+        <div class="options">
+          <label><input type="checkbox" name="q5" value="HYDROGEL"> Hydrogel (Standard Oxygen)</label>
+          <label><input type="checkbox" name="q5" value="SILICONE HYDROGEL"> Silicone Hydrogel (High Oxygen)</label>
+        </div>
+      </div>
+
+      <!-- Converter (pro) -->
+      <div class="section2 simple-hide" id="specToCL">
+        <h2>Spectacle → Contact Lens Power Converter</h2>
+        <div style="display:flex; align-items:flex-end; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <strong style="color:var(--text-mid);">RE Specs:</strong>
+            Sph <input id="sph-re" type="number" step="0.25" style="width:70px; text-align:center;">
+            Cyl <input id="cyl-re" type="number" step="0.25" style="width:70px; text-align:center;">
+            Axis <input id="axis-re" type="number" min="0" max="180" step="1" style="width:70px; text-align:center;">
           </div>
-          <div>
-            <div style="font-weight:700;margin-bottom:6px;">LE Results</div>
-            <div id="leResult"></div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <strong style="color:var(--text-mid);">LE Specs:</strong>
+            Sph <input id="sph-le" type="number" step="0.25" style="width:70px; text-align:center;">
+            Cyl <input id="cyl-le" type="number" step="0.25" style="width:70px; text-align:center;">
+            Axis <input id="axis-le" type="number" min="0" max="180" step="1" style="width:70px; text-align:center;">
+          </div>
+          <button id="convertBtn">Convert</button>
+        </div>
+        <div style="display:flex; gap:14px; margin-top:14px; align-items:flex-start; flex-wrap:wrap;">
+          <div id="clOut">
+            <div>
+              <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">RE Results</div>
+              <div id="reResult" style="font-size:12px; line-height:1.8;"></div>
+            </div>
+            <div>
+              <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">LE Results</div>
+              <div id="leResult" style="font-size:12px; line-height:1.8;"></div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:7px;">
+            <button id="auto1">Auto-fill 1</button>
+            <button id="auto2">Auto-fill 2</button>
+            <button id="auto3">Auto-fill 3</button>
+            <button id="autoSE" class="btn-outline">Auto-fill SE</button>
           </div>
         </div>
-
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <button id="auto1">Auto-fill 1</button>
-          <button id="auto2">Auto-fill 2</button>
-          <button id="auto3">Auto-fill 3</button>
-          <button id="autoSE">Auto-fill SE</button>
-        </div>
-      </div>
-    </div>
-
-
-
-
-
-
-    <!-- Sort bar + Results -->
-    <div id="sortBar">
-      <b>Sort:</b>
-      <select id="sortSelect" style="padding:4px; font-size:12px; border-radius:10px">
-        <option value="price-asc">Price Low → High</option>
-        <option value="price-desc">Price High → Low</option>
-        <option value="valuepair-asc">Value/Pair Low → High</option>
-        <option value="valuepair-desc">Value/Pair High → Low</option>
-        <option value="comfort-desc">Comfort Premium → Basic</option>
-        <option value="comfort-asc">Comfort Basic → Premium</option>
-        <option value="hours-desc">Wearing hours Long → Short</option>
-        <option value="hours-asc">Wearing hours Short → Long</option>
-      </select>
-    </div>
       </div>
 
-<div id="compareArea"></div>
+      <!-- Sort bar -->
+      <div id="sortBar" style="display:none;">
+        <strong style="color:var(--text-mid);">Sort:</strong>
+        <select id="sortSelect">
+          <option value="price-asc">Price Low → High</option>
+          <option value="price-desc">Price High → Low</option>
+          <option value="valuepair-asc">Value/Pair Low → High</option>
+          <option value="valuepair-desc">Value/Pair High → Low</option>
+          <option value="comfort-desc">Comfort Premium → Basic</option>
+          <option value="comfort-asc">Comfort Basic → Premium</option>
+          <option value="hours-desc">Wearing Hours Long → Short</option>
+          <option value="hours-asc">Wearing Hours Short → Long</option>
+        </select>
+      </div>
 
+    </div><!-- end section -->
+
+    <div id="compareArea"></div>
 
     <div class="results" id="results">
       <div id="cardsGrid"></div>
     </div>
 
+  </div><!-- end targetSection -->
 
-</div>
-</div>
-</div>
-</div>
-<div style="height:300px"></div>
+</div><!-- end container -->
 
+<div style="height:200px"></div>
 
+<!-- ====================== LIGHTBOX ====================== -->
+<div id="imgZoom" aria-modal="true" role="dialog">
+  <div class="inner">
+    <div id="zoomCardBox"></div>
+    <div class="hint">Tap outside or press Esc to close</div>
+  </div>
+</div>
+
+<!-- ====================== ALL SCRIPTS (unchanged logic) ====================== -->
 
 <script>
-/* =========================
-   Password overlay
-========================= */
+/* Password overlay */
 (function(){
-  const overlay=document.getElementById("overlay");
-  const content=document.getElementById("content");
+  const overlay = document.getElementById("overlay");
+  const content = document.getElementById("content");
   function checkPassword(){
-    let password=""; const correctPassword="";
-    while(password!==correctPassword){
-      password=prompt("Please enter password to use:");
-      if(password===null){ overlay.textContent="Sorry, Access Denied."; return false; }
-      if(password!==correctPassword) alert("Wrong password. Try again.");
+    let password = "";
+    const correctPassword = "";
+    while(password !== correctPassword){
+      password = prompt("Please enter password to use:");
+      if(password === null){ overlay.textContent = "Sorry, Access Denied."; return false; }
+      if(password !== correctPassword) alert("Wrong password. Try again.");
     }
     return true;
   }
-  window.addEventListener("load",()=>{ if(checkPassword()){ overlay.style.display="none"; content.style.display="block"; }});
+  window.addEventListener("load", () => {
+    if(checkPassword()){ overlay.style.display = "none"; content.style.display = "block"; }
+  });
 })();
 </script>
 
 <script>
-/* =========================
-   Tap-to-expand binding (short label stays; long appears below, not bold)
-========================= */
-function bindDefToggles(scope=document){
-  scope.querySelectorAll('.def-term').forEach(el=>{
+/* Tap-to-expand binding */
+function bindDefToggles(scope = document){
+  scope.querySelectorAll('.def-term').forEach(el => {
     if(el.dataset.ready) return;
-    el.dataset.ready="1";
-    let extra=el.parentElement.querySelector('.def-extra');
+    el.dataset.ready = "1";
+    let extra = el.parentElement.querySelector('.def-extra');
     if(!extra){
-      extra=document.createElement('div');
-      extra.className='def-extra';
+      extra = document.createElement('div');
+      extra.className = 'def-extra';
       el.parentElement.appendChild(extra);
     }
-    el.addEventListener('click',()=>{
-      const open=extra.style.display==='block';
-      if(open){ extra.style.display='none'; extra.innerHTML=''; }
-      else { extra.innerHTML=el.dataset.long || ''; extra.style.display='block'; }
+    el.addEventListener('click', () => {
+      const open = extra.style.display === 'block';
+      if(open){ extra.style.display = 'none'; extra.innerHTML = ''; }
+      else { extra.innerHTML = el.dataset.long || ''; extra.style.display = 'block'; }
     });
   });
 }
 </script>
 
 <script>
-/* =========================
-   RESULTS ENGINE (CSV → Filters → Cards → Lightbox)
-========================= */
-const csvUrl='https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
+/* RESULTS ENGINE */
+const csvUrl = 'https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
+let products = []; let csvLoaded = false;
 
-let products=[]; let csvLoaded=false;
+const showBtn    = document.getElementById('showBtn');
+const promoBtn   = document.getElementById('promoBtn');
+const btnText    = document.getElementById('btnText');
+const sortBar    = document.getElementById('sortBar');
+const sortSelect = document.getElementById('sortSelect');
+const rxToggleBtn = document.getElementById('rxToggleBtn');
+const rxIcons    = document.getElementById('rxIcons');
 
-const showBtn=document.getElementById('showBtn');
-const promoBtn=document.getElementById('promoBtn');
-const btnText=document.getElementById('btnText');
-const sortBar=document.getElementById('sortBar');
-const sortSelect=document.getElementById('sortSelect');
-
-const rxToggleBtn=document.getElementById('rxToggleBtn');
-const rxIcons=document.getElementById('rxIcons');
-
-/* RX images toggle */
-rxToggleBtn?.addEventListener('click',()=>{
-  rxIcons.style.display=(rxIcons.style.display==='none'||rxIcons.style.display==='')?'flex':'none';
+rxToggleBtn?.addEventListener('click', () => {
+  rxIcons.style.display = (rxIcons.style.display === 'none' || rxIcons.style.display === '') ? 'flex' : 'none';
 });
 
-/* CSV parsing */
 function parseCSV(text){
-  const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(l=>l.trim()!=='');
-  if(lines.length<2) return {headers:[],rows:[]};
-  const splitRow=row=> row.match(/(?:,|\n|^)(?:"([^"]*(?:""[^"]*)*)"|([^",\n]*))/g)
-    ?.map(s=>s.replace(/^,/,''))
-    ?.map(s=>s.replace(/^"|"$/g,'').replace(/""/g,'"')) || [];
-  const headers=splitRow(lines[0]).map(h=>h.trim());
-  const rows=lines.slice(1).map(line=>splitRow(line));
-  return {headers,rows};
+  const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim() !== '');
+  if(lines.length < 2) return {headers:[], rows:[]};
+  const splitRow = row => row.match(/(?:,|\n|^)(?:"([^"]*(?:""[^"]*)*)"|([^",\n]*))/g)
+    ?.map(s => s.replace(/^,/, ''))
+    ?.map(s => s.replace(/^"|"$/g, '').replace(/""/g, '"')) || [];
+  const headers = splitRow(lines[0]).map(h => h.trim());
+  const rows = lines.slice(1).map(line => splitRow(line));
+  return {headers, rows};
 }
 
-/* Load CSV */
-fetch(csvUrl,{cache:'no-store'})
-  .then(res=>{ if(!res.ok) throw new Error("HTTP "+res.status); return res.text(); })
-  .then(text=>{
-    const {headers,rows}=parseCSV(text);
-    products=rows.map(r=>{ const o={}; headers.forEach((h,i)=>o[h]=(r[i]??'').trim()); return o; });
-    csvLoaded=true;
-    if(showBtn){ showBtn.disabled=false; showBtn.textContent='Show Results'; }
-    if(promoBtn){ promoBtn.disabled=false; promoBtn.textContent='Show Promo Only'; }
-    if(btnText){ btnText.textContent=''; }
+fetch(csvUrl, {cache:'no-store'})
+  .then(res => { if(!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
+  .then(text => {
+    const {headers, rows} = parseCSV(text);
+    products = rows.map(r => { const o = {}; headers.forEach((h,i) => o[h] = (r[i] ?? '').trim()); return o; });
+    csvLoaded = true;
+    if(showBtn){ showBtn.disabled = false; showBtn.textContent = 'Show Results'; }
+    if(promoBtn){ promoBtn.disabled = false; promoBtn.textContent = 'Show Promo Only'; }
+    if(btnText){ btnText.textContent = ''; }
   })
-  .catch(err=>{
-    console.error("CSV Load Error:",err);
-    if(showBtn){ showBtn.disabled=true; showBtn.textContent='Load failed'; }
-    if(btnText){ btnText.textContent='Please refresh to retry.'; }
+  .catch(err => {
+    console.error("CSV Load Error:", err);
+    if(showBtn){ showBtn.disabled = true; showBtn.textContent = 'Load failed'; }
+    if(btnText){ btnText.textContent = 'Please refresh to retry.'; }
   });
 
-/* Gather filters */
 function getSelections(){
-  const selected={q1:[],q2:[],q3:[],q4:[],q5:[],q6:[]};
-  document.querySelectorAll('input[type="checkbox"]:checked').forEach(c=>{
+  const selected = {q1:[],q2:[],q3:[],q4:[],q5:[],q6:[]};
+  document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
     if(selected[c.name]) selected[c.name].push(c.value.toUpperCase());
   });
   return selected;
 }
 
-/* Filter core */
-function filterProducts(selected,query){
-  const q1Col="LENS TYPE (CLEAR, COLOUR)";
-  const mCol ="MODALITY (1 Day, 2 Weeks, 1 Month, 3 Months)";
-  const vCol ="VISION (SPH, ASTIG, MF)";
-  const COMFORT_COL="COMFORT";
-  const MATERIAL_COL="MATERIAL";
+function filterProducts(selected, query){
+  const q1Col = "LENS TYPE (CLEAR, COLOUR)";
+  const mCol  = "MODALITY (1 Day, 2 Weeks, 1 Month, 3 Months)";
+  const vCol  = "VISION (SPH, ASTIG, MF)";
+  const COMFORT_COL  = "COMFORT";
+  const MATERIAL_COL = "MATERIAL";
+  const terms = (query || '').toLowerCase().split(/\s+/).filter(Boolean);
 
-  const terms=(query||'').toLowerCase().split(/\s+/).filter(Boolean);
-
-  return products.filter(p=>{
-    const lensType=(p[q1Col]||'').toUpperCase();
-    const modality=(p[mCol]||'').toUpperCase();
-    const vision  =(p[vCol]||'').toUpperCase();
-    const comfort =(p[COMFORT_COL]||'').toUpperCase();
-    const material=(p[MATERIAL_COL]||'').toUpperCase();
+  return products.filter(p => {
+    const lensType = (p[q1Col] || '').toUpperCase();
+    const modality = (p[mCol]  || '').toUpperCase();
+    const vision   = (p[vCol]  || '').toUpperCase();
+    const comfort  = (p[COMFORT_COL]  || '').toUpperCase();
+    const material = (p[MATERIAL_COL] || '').toUpperCase();
 
     if(selected.q1.length && !selected.q1.includes(lensType)) return false;
     if(selected.q2.length && !selected.q2.includes(modality)) return false;
@@ -1081,376 +1265,194 @@ function filterProducts(selected,query){
     if(selected.q4.length && !selected.q4.includes(comfort))  return false;
     if(selected.q5.length && !selected.q5.includes(material)) return false;
 
-    // Q6: Loose vs Not Loose — detect by FULL NAME containing "loose"
-    const fullName=p["FULL NAME"]||"";
-    const isLoose=/\bloose\b/i.test(fullName);
+    const fullName = p["FULL NAME"] || "";
+    const isLoose  = /\bloose\b/i.test(fullName);
     if(selected.q6.length){
       const wantsLoose    = selected.q6.includes("LOOSE");
       const wantsNotLoose = selected.q6.includes("NOT_LOOSE");
-      if(wantsLoose!==wantsNotLoose){
-        if(wantsLoose && !isLoose) return false;
-        if(wantsNotLoose && isLoose) return false;
+      if(wantsLoose !== wantsNotLoose){
+        if(wantsLoose    && !isLoose) return false;
+        if(wantsNotLoose &&  isLoose) return false;
       }
     }
-
-    // Fuzzy search
     if(terms.length){
-      const rowText=Object.values(p).join(" ").toLowerCase();
-      if(!terms.every(t=>rowText.includes(t))) return false;
+      const rowText = Object.values(p).join(" ").toLowerCase();
+      if(!terms.every(t => rowText.includes(t))) return false;
     }
     return true;
   });
 }
 
-/* Helpers */
 function getNumericPrice(p){
-  const text=(p["1 BOX PRICE & UNIT"]||"").replace(/,/g,"");
-  const m=text.match(/(\d+(\.\d+)?)/);
-  return m?parseFloat(m[1]):Number.POSITIVE_INFINITY;
+  const text = (p["1 BOX PRICE & UNIT"] || "").replace(/,/g,"");
+  const m = text.match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
 }
 function getNumericValuePerPair(p){
-  const text=(p["VALUE_PER_PAIR"]||"").toString().replace(/,/g,"").trim();
+  const text = (p["VALUE_PER_PAIR"] || "").toString().replace(/,/g,"").trim();
   if(!text) return Number.POSITIVE_INFINITY;
-  const m=text.match(/(\d+(\.\d+)?)/);
-  return m?parseFloat(m[1]):Number.POSITIVE_INFINITY;
+  const m = text.match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
 }
 function getWearingHours(p){
-  const v=parseFloat(String(p["WEARING_HOURS"]||"").replace(/[^\d.]/g,""));
-  return Number.isFinite(v)?v:null;
+  const v = parseFloat(String(p["WEARING_HOURS"] || "").replace(/[^\d.]/g,""));
+  return Number.isFinite(v) ? v : null;
 }
-function niceCase(s=""){ return String(s).toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()); }
+function niceCase(s=""){ return String(s).toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
 function mapMaterial(s=""){
-  const u=s.toUpperCase().trim();
-  if(u==="HYDROGEL") return "Hydrogel (Standard Oxygen)";
-  if(u==="SILICONE HYDROGEL") return "Silicone Hydrogel (High Oxygen)";
+  const u = s.toUpperCase().trim();
+  if(u === "HYDROGEL") return "Hydrogel (Standard Oxygen)";
+  if(u === "SILICONE HYDROGEL") return "Silicone Hydrogel (High Oxygen)";
   return niceCase(s);
 }
 function mapComfortRank(s=""){
-  const u=(s||"").toUpperCase().trim();
-  if(u==="PREMIUM") return 3;
-  if(u==="GOOD")    return 2;
-  if(u==="BASIC")   return 1;
+  const u = (s || "").toUpperCase().trim();
+  if(u === "PREMIUM") return 3;
+  if(u === "GOOD")    return 2;
+  if(u === "BASIC")   return 1;
   return 0;
 }
-
 </script>
-
-
 
 <script>
-// =========================
-// ETA helpers (MY/KL rules) + Loose start Tue/Thu
-// =========================
-
-// Selangor + Kuala Lumpur Public Holidays (2025–2026, with Sunday replacements)
+/* ETA helpers */
 const PUBLIC_HOLIDAYS = new Set([
-  // === 2025 ===
-  "2025-01-01", // New Year's Day
-  "2025-01-29", // Chinese New Year (Day 1)
-  "2025-01-30", // Chinese New Year (Day 2)
-  "2025-02-01", // Federal Territory Day (KL)
-  "2025-02-03", // Federal Territory Day Holiday (in-lieu)
-  "2025-02-11", // Thaipusam
-  "2025-03-18", // Nuzul Al-Quran
-  "2025-03-31", // Hari Raya Aidilfitri (Day 1)
-  "2025-04-01", // Hari Raya Aidilfitri (Day 2)
-  "2025-05-01", // Labour Day
-  "2025-05-12", // Wesak Day
-  "2025-06-02", // Agong's (King's) Birthday
-  "2025-06-07", // Hari Raya Haji
-  "2025-06-27", // Awal Muharram
-  "2025-08-31", // Merdeka Day (Sunday)
-  "2025-09-01", // Merdeka Day Holiday (in-lieu Monday)
-  "2025-09-05", // Maulidur Rasul
-  "2025-09-15", // Malaysia Day Holiday (per listings)
-  "2025-09-16", // Malaysia Day
-  "2025-10-20", // Deepavali
-  "2025-12-11", // Sultan of Selangor's Birthday
-  "2025-12-25", // Christmas
-
-  // === 2026 ===
-  "2026-01-01", // New Year's Day
-  "2026-02-01", // Thaipusam (Sunday)
-  "2026-02-02", // Thaipusam Holiday (in-lieu Monday)
-  "2026-02-17", // Chinese New Year (Day 1)
-  "2026-02-18", // Chinese New Year (Day 2)
-  "2026-03-07", // Nuzul Al-Quran (Saturday, no replacement)
-  "2026-03-21", // Hari Raya Aidilfitri (Day 1, Saturday)
-  "2026-03-22", // Hari Raya Aidilfitri (Day 2, Sunday)
-  "2026-03-23", // Hari Raya Aidilfitri Holiday (in-lieu Monday)
-  "2026-05-01", // Labour Day (Friday)
-  "2026-05-27", // Hari Raya Haji
-  "2026-05-31", // Wesak Day (Sunday)
-  "2026-06-01", // Wesak Day Holiday (in-lieu Monday)
-  "2026-06-01", // Agong's (King's) Birthday (same day as in-lieu)
-  "2026-06-17", // Awal Muharram
-  "2026-08-25", // Maulidur Rasul
-  "2026-08-31", // Merdeka Day (Monday)
-  "2026-09-16", // Malaysia Day (Wednesday)
-  "2026-11-08", // Deepavali (Sunday)
-  "2026-11-09", // Deepavali Holiday (in-lieu Monday)
-  "2026-12-11", // Sultan of Selangor's Birthday (Friday)
-  "2026-12-25", // Christmas (Friday)
+  "2025-01-01","2025-01-29","2025-01-30","2025-02-01","2025-02-03","2025-02-11",
+  "2025-03-18","2025-03-31","2025-04-01","2025-05-01","2025-05-12","2025-06-02",
+  "2025-06-07","2025-06-27","2025-08-31","2025-09-01","2025-09-05","2025-09-15",
+  "2025-09-16","2025-10-20","2025-12-11","2025-12-25",
+  "2026-01-01","2026-02-01","2026-02-02","2026-02-17","2026-02-18","2026-03-07",
+  "2026-03-21","2026-03-22","2026-03-23","2026-05-01","2026-05-27","2026-05-31",
+  "2026-06-01","2026-06-17","2026-08-25","2026-08-31","2026-09-16","2026-11-08",
+  "2026-11-09","2026-12-11","2026-12-25",
 ]);
 
-
 function toYMD(d){
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const da= String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${da}`;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-function addDays(d, n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
 function lastDayOfMonth(d){ return new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); }
-
-function isWeekend(d){ const w=d.getDay(); return w===0 || w===6; } // Sun=0, Sat=6
+function isWeekend(d){ const w=d.getDay(); return w===0||w===6; }
 function isHoliday(d){ return PUBLIC_HOLIDAYS.has(toYMD(d)); }
-function isCutoff(d){
-  const last = lastDayOfMonth(d);         // 28/29/30/31
-  const start = last - 6;                 // last 7 days inclusive
-  return d.getDate() >= start;
-}
-function isWorkingDay(d){
-  return !(isWeekend(d) || isHoliday(d) || isCutoff(d));
-}
-
+function isCutoff(d){ const last=lastDayOfMonth(d); return d.getDate()>=(last-6); }
+function isWorkingDay(d){ return !(isWeekend(d)||isHoliday(d)||isCutoff(d)); }
 function nextTueThu(fromDate){
-  // Tue=2, Thu=4
-  let d = new Date(fromDate);
-  while (d.getDay() !== 2 && d.getDay() !== 4) {
-    d = addDays(d, 1);
-  }
+  let d=new Date(fromDate);
+  while(d.getDay()!==2&&d.getDay()!==4){ d=addDays(d,1); }
   return d;
 }
-
 function formatETA(d){
-  return new Intl.DateTimeFormat('en-MY', {
-    weekday:'short', day:'numeric', month:'short', year:'numeric'
-  }).format(d);
+  return new Intl.DateTimeFormat('en-MY',{weekday:'short',day:'numeric',month:'short',year:'numeric'}).format(d);
 }
-
-function withFlags(base, cutFlag, holFlag){
-  let s = base;
-  if (cutFlag) s += ' *affected by cut off*';
-  if (holFlag) s += ' *affected by holiday*';
+function withFlags(base,cutFlag,holFlag){
+  let s=base;
+  if(cutFlag) s+=' *affected by cut off*';
+  if(holFlag) s+=' *affected by holiday*';
   return s;
 }
-
-/**
- * computeETA(leadDays, { looseStart: boolean })
- * - Standard: start counting from tomorrow.
- * - Loose: start counting from the nearest coming Tue/Thu (>= tomorrow).
- * - Count only working days (weekend/cutoff/holiday skipped).
- * - Flags if we SKIP due to cutoff or holiday (weekends never flagged).
- * - leadDays=0:
- *      - standard: today if working else next working (flags if skip due to cutoff/holiday)
- *      - loose: the coming Tue/Thu if working else next working day after it (flags if skip due to cutoff/holiday)
- */
-function computeETA(leadDays, opts={}){
-  let cutFlag=false, holFlag=false;
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const loose = !!opts.looseStart;
-
-  // Decide base start date
+function computeETA(leadDays,opts={}){
+  let cutFlag=false,holFlag=false;
+  const now=new Date();
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const loose=!!opts.looseStart;
   let base;
-  if (loose) {
-    base = nextTueThu(addDays(today, 1));         // the nearest Tue/Thu from tomorrow
-  } else {
-    base = addDays(today, 1);                     // tomorrow
-  }
+  if(loose){ base=nextTueThu(addDays(today,1)); }
+  else { base=addDays(today,1); }
 
-  // Special: leadDays = 0
-  if (Number(leadDays) === 0){
-    if (!loose){
-      if (isWorkingDay(today)) {
-        return { date: today, text: formatETA(today), cutFlag:false, holFlag:false };
-      }
-      let d = addDays(today, 1);
-      while (!isWorkingDay(d)) {
-        if (isCutoff(d)) cutFlag = true;
-        if (isHoliday(d)) holFlag = true;
-        d = addDays(d, 1);
-      }
-      return { date:d, text: withFlags(formatETA(d), cutFlag, holFlag), cutFlag, holFlag };
+  if(Number(leadDays)===0){
+    if(!loose){
+      if(isWorkingDay(today)) return {date:today,text:formatETA(today),cutFlag:false,holFlag:false};
+      let d=addDays(today,1);
+      while(!isWorkingDay(d)){ if(isCutoff(d)) cutFlag=true; if(isHoliday(d)) holFlag=true; d=addDays(d,1); }
+      return {date:d,text:withFlags(formatETA(d),cutFlag,holFlag),cutFlag,holFlag};
     } else {
-      // loose + 0 days => that Tue/Thu if working, otherwise next working day
-      let d = new Date(base);
-      if (!isWorkingDay(d)){
-        do {
-          if (isCutoff(d)) cutFlag = true;
-          if (isHoliday(d)) holFlag = true;
-          d = addDays(d, 1);
-        } while(!isWorkingDay(d));
-      }
-      return { date:d, text: withFlags(formatETA(d), cutFlag, holFlag), cutFlag, holFlag };
+      let d=new Date(base);
+      if(!isWorkingDay(d)){ do { if(isCutoff(d)) cutFlag=true; if(isHoliday(d)) holFlag=true; d=addDays(d,1); } while(!isWorkingDay(d)); }
+      return {date:d,text:withFlags(formatETA(d),cutFlag,holFlag),cutFlag,holFlag};
     }
   }
 
-  // leadDays >= 1 : count working days from base
-  let d = new Date(base);
-  let needed = Math.max(0, parseInt(leadDays,10) || 0);
-
-  while (needed > 0){
-    if (isWorkingDay(d)){
-      needed -= 1;                 // this working day counts
-      if (needed === 0) break;     // d is ETA
-      d = addDays(d, 1);
-    } else {
-      if (isCutoff(d)) cutFlag = true;
-      if (isHoliday(d)) holFlag = true;
-      d = addDays(d, 1);           // skip non-working
-    }
+  let d=new Date(base);
+  let needed=Math.max(0,parseInt(leadDays,10)||0);
+  while(needed>0){
+    if(isWorkingDay(d)){ needed-=1; if(needed===0) break; d=addDays(d,1); }
+    else { if(isCutoff(d)) cutFlag=true; if(isHoliday(d)) holFlag=true; d=addDays(d,1); }
   }
-
-  return { date:d, text: withFlags(formatETA(d), cutFlag, holFlag), cutFlag, holFlag };
+  return {date:d,text:withFlags(formatETA(d),cutFlag,holFlag),cutFlag,holFlag};
 }
 </script>
-
-
-
-
 
 <script>
 /* Show Results pipeline */
-let promoOnlyMode=false;
+let promoOnlyMode = false;
 
-function showResults() {
-  if (!csvLoaded) return;
+function showResults(){
+  if(!csvLoaded) return;
   const selected = getSelections();
-
-  const reInput = (document.getElementById("searchRE")?.value || "").trim().toLowerCase();
-  const leInput = (document.getElementById("searchLE")?.value || "").trim().toLowerCase();
-
+  const reInput = (document.getElementById("searchRE")?.value||"").trim().toLowerCase();
+  const leInput = (document.getElementById("searchLE")?.value||"").trim().toLowerCase();
   const reHasAstig = /c-?(0\.[1-9]|[1-9])/i.test(reInput);
   const leHasAstig = /c-?(0\.[1-9]|[1-9])/i.test(leInput);
-
-  // Detect which side has astig
-  let toricInput = "", sphereInput = "";
-  if (reHasAstig && !leHasAstig) {
-    toricInput = reInput;
-    sphereInput = leInput;
-  } else if (leHasAstig && !reHasAstig) {
-    toricInput = leInput;
-    sphereInput = reInput;
-  } else {
-    // both or neither → fallback to current overlap logic
-    const reFiltered = filterProducts(selected, reInput);
-    const leFiltered = filterProducts(selected, leInput || reInput);
-    const setLE = new Set(leFiltered.map(p => p["FULL NAME"]));
-    let overlapping = reFiltered.filter(p => setLE.has(p["FULL NAME"]));
-    if (promoOnlyMode) overlapping = overlapping.filter(p => (p["PROMO"] || "").trim().length > 0);
+  let toricInput="", sphereInput="";
+  if(reHasAstig&&!leHasAstig){ toricInput=reInput; sphereInput=leInput; }
+  else if(leHasAstig&&!reHasAstig){ toricInput=leInput; sphereInput=reInput; }
+  else {
+    const reFiltered=filterProducts(selected,reInput);
+    const leFiltered=filterProducts(selected,leInput||reInput);
+    const setLE=new Set(leFiltered.map(p=>p["FULL NAME"]));
+    let overlapping=reFiltered.filter(p=>setLE.has(p["FULL NAME"]));
+    if(promoOnlyMode) overlapping=overlapping.filter(p=>(p["PROMO"]||"").trim().length>0);
     return renderCards(overlapping);
   }
-
-  // --- STEP 1: find ASTIG products for the C side
-  const toricFiltered = filterProducts(selected, toricInput).filter(p =>
-    (p["VISION (SPH, ASTIG, MF)"] || "").toUpperCase().includes("ASTIG")
-  );
-
-  if (!toricFiltered.length) {
-    renderCards([]);
-    return;
-  }
-
-  // --- STEP 2: find all matching PRODUCT names
-  const productNames = new Set(toricFiltered.map(p => (p["PRODUCT"] || "").toUpperCase()));
-
-  // --- STEP 3: find spherical versions with same PRODUCT
-  const sphereFiltered = products.filter(p =>
-    productNames.has((p["PRODUCT"] || "").toUpperCase()) &&
-    (p["VISION (SPH, ASTIG, MF)"] || "").toUpperCase().includes("SPH")
-  );
-
-  // --- STEP 4: combine toric first, then spherical
-  let combined = [...toricFiltered, ...sphereFiltered];
-
-  // --- STEP 5: promo-only filter
-  if (promoOnlyMode) {
-    combined = combined.filter(p => (p["PROMO"] || "").trim().length > 0);
-  }
-
-// --- STEP 6: group so pairs appear together
-combined.sort((a, b) => {
-  const prodA = (a["PRODUCT"] || "").toUpperCase();
-  const prodB = (b["PRODUCT"] || "").toUpperCase();
-  if (prodA !== prodB) return prodA.localeCompare(prodB); // group by product
-
-  const order = { ASTIG: 1, SPH: 2, MF: 3 };
-  const vA = order[(a["VISION (SPH, ASTIG, MF)"] || "").toUpperCase()] || 99;
-  const vB = order[(b["VISION (SPH, ASTIG, MF)"] || "").toUpperCase()] || 99;
-  return vA - vB; // toric first, then SPH, then MF
-});
-
-
+  const toricFiltered=filterProducts(selected,toricInput).filter(p=>(p["VISION (SPH, ASTIG, MF)"]||"").toUpperCase().includes("ASTIG"));
+  if(!toricFiltered.length){ renderCards([]); return; }
+  const productNames=new Set(toricFiltered.map(p=>(p["PRODUCT"]||"").toUpperCase()));
+  const sphereFiltered=products.filter(p=>productNames.has((p["PRODUCT"]||"").toUpperCase())&&(p["VISION (SPH, ASTIG, MF)"]||"").toUpperCase().includes("SPH"));
+  let combined=[...toricFiltered,...sphereFiltered];
+  if(promoOnlyMode) combined=combined.filter(p=>(p["PROMO"]||"").trim().length>0);
+  combined.sort((a,b)=>{
+    const prodA=(a["PRODUCT"]||"").toUpperCase();
+    const prodB=(b["PRODUCT"]||"").toUpperCase();
+    if(prodA!==prodB) return prodA.localeCompare(prodB);
+    const order={ASTIG:1,SPH:2,MF:3};
+    const vA=order[(a["VISION (SPH, ASTIG, MF)"]||"").toUpperCase()]||99;
+    const vB=order[(b["VISION (SPH, ASTIG, MF)"]||"").toUpperCase()]||99;
+    return vA-vB;
+  });
   renderCards(combined);
 }
 
-
-
-
-
-
-
-
-
-/* Enter to search */
 ["searchRE","searchLE"].forEach(id=>{
   const el=document.getElementById(id);
-  el && el.addEventListener("keydown",e=>{
-    if(e.key==="Enter"){ e.preventDefault(); showResults(); }
-  });
+  el&&el.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); showResults(); } });
 });
 
-/* Buttons */
 showBtn?.addEventListener("click",()=>{ promoOnlyMode=false; showResults(); });
 promoBtn?.addEventListener("click",()=>{ promoOnlyMode=true; showResults(); });
 
-/* Sorting */
 sortSelect?.addEventListener("change",()=>{
   const items=[...(window._lastResults||[])];
   const val=sortSelect.value;
-
-  if(val.startsWith("price")){
-    const dir=val.endsWith("asc")?1:-1;
-    items.sort((a,b)=>(getNumericPrice(a)-getNumericPrice(b))*dir);
-  }else if(val.startsWith("valuepair")){
-    const dir=val.endsWith("asc")?1:-1;
-    items.sort((a,b)=>(getNumericValuePerPair(a)-getNumericValuePerPair(b))*dir);
-  }else if(val==="comfort-desc"){
-    items.sort((a,b)=>mapComfortRank(b["COMFORT"])-mapComfortRank(a["COMFORT"]));
-  }else if(val==="comfort-asc"){
-    items.sort((a,b)=>mapComfortRank(a["COMFORT"])-mapComfortRank(b["COMFORT"]));
-  }else if(val==="hours-desc"){
-    items.sort((a,b)=>(getWearingHours(b) ?? -Infinity) - (getWearingHours(a) ?? -Infinity));
-  }else if(val==="hours-asc"){
-    items.sort((a,b)=>(getWearingHours(a) ??  Infinity) - (getWearingHours(b) ??  Infinity));
-  }
+  if(val.startsWith("price")){ const dir=val.endsWith("asc")?1:-1; items.sort((a,b)=>(getNumericPrice(a)-getNumericPrice(b))*dir); }
+  else if(val.startsWith("valuepair")){ const dir=val.endsWith("asc")?1:-1; items.sort((a,b)=>(getNumericValuePerPair(a)-getNumericValuePerPair(b))*dir); }
+  else if(val==="comfort-desc"){ items.sort((a,b)=>mapComfortRank(b["COMFORT"])-mapComfortRank(a["COMFORT"])); }
+  else if(val==="comfort-asc"){ items.sort((a,b)=>mapComfortRank(a["COMFORT"])-mapComfortRank(b["COMFORT"])); }
+  else if(val==="hours-desc"){ items.sort((a,b)=>(getWearingHours(b)??-Infinity)-(getWearingHours(a)??-Infinity)); }
+  else if(val==="hours-asc"){ items.sort((a,b)=>(getWearingHours(a)??Infinity)-(getWearingHours(b)??Infinity)); }
   buildCards(items);
 });
 
-/* Render Cards */
 function renderCards(data){
   const container=document.getElementById("cardsGrid");
   const bar=document.getElementById("sortBar");
   if(!container) return;
-
   if(!data||!data.length){
-    container.innerHTML="<p>No matching products found.</p>";
-    bar.style.display="none";
-    return;
+    container.innerHTML='<p style="color:var(--text-muted); font-size:13px; padding:12px;">No matching products found.</p>';
+    bar.style.display="none"; return;
   }
   bar.style.display="flex";
-
-  // De-duplicate by FULL NAME
   const seen=new Set();
-  const clean=data.filter(p=>{
-    const key=p["FULL NAME"]||"";
-    if(seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-
+  const clean=data.filter(p=>{ const key=p["FULL NAME"]||""; if(seen.has(key)) return false; seen.add(key); return true; });
   window._lastResults=clean;
   buildCards(clean);
 }
@@ -1458,137 +1460,106 @@ function renderCards(data){
 function buildCards(list){
   const grid=document.getElementById("cardsGrid");
   if(!grid) return;
-
   const H_DISPOSE="MODALITY (1 day, 2 weeks, 1 month, 3 months)";
-  const H_PRICE ="1 BOX PRICE & UNIT";
-  const H_VALUE ="VALUE_PER_PAIR";
-  const H_PROMO ="PROMO";
+  const H_PRICE="1 BOX PRICE & UNIT";
+  const H_VALUE="VALUE_PER_PAIR";
+  const H_PROMO="PROMO";
   const H_COMFORT="COMFORT";
-  const H_MAT   ="MATERIAL";
-  const H_HOURS ="WEARING_HOURS";
+  const H_MAT="MATERIAL";
+  const H_HOURS="WEARING_HOURS";
 
   const html=list.map((p,idx)=>{
     const id="card_"+idx;
     const name=p["FULL NAME"]||"";
     const promo=(p[H_PROMO]||"").trim();
     const hasPromo=promo.length>0;
-
-
-
     const photoKey=(p["PHOTO"]||"").trim();
     const hasPhoto=!!photoKey;
     const photoURL=hasPhoto?`https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png`:"";
-
     const price=p[H_PRICE]||"";
     const value=p[H_VALUE]||"";
     const hoursRaw=p[H_HOURS]||"";
     const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
-
-const nameForLoose = p["FULL NAME"] || "";
-const isLoose = /\bloose\b/i.test(nameForLoose);            // detect loose lens
-const leadDays = parseInt(p["LEAD_TIME"] || "3", 10);
-const etaText  = computeETA(leadDays, { looseStart: isLoose }).text;
-
+    const isLoose=/\bloose\b/i.test(name);
+    const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
+    const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
 
     return `
       <div id="${id}" class="pane lens-card card-compact" style="position:relative;">
-        <div style="font-weight:700; margin-bottom:6px;">${name}</div>
-        <div class="photo" style="margin-bottom:6px;">
-          ${ hasPhoto
-              ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
-              : `<div style="width:180px;height:120px;display:flex;align-items:center;justify-content:center;color:#666;border:1px dashed #ccc;border-radius:10px;">No photo</div>`
+        <div style="font-weight:600; font-size:13px; color:var(--text); margin-bottom:8px;">${name}</div>
+        <div class="photo" style="margin-bottom:8px;">
+          ${hasPhoto
+            ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
+            : `<div style="width:100%;height:100px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);font-size:12px;">No photo</div>`
           }
-${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}
+          ${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}
         </div>
-        <div><b>Price :</b> ${price}</div>
-        <div><b>Value Per Piece :</b> ${value || "-"}</div>
-        <div><b>Estimated Comfy Hours :</b> ${hours || "-"}</div>
-<div><b>Estimated Ready :</b> ${etaText} <br><i>* May take more than a month if no stock</i></div>
-
+        <div style="font-size:12px; line-height:1.7; color:var(--text-mid);">
+          <div><span style="font-weight:600;">Price:</span> ${price}</div>
+          <div><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>
+          <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
+          <div><span style="font-weight:600;">Est. Ready:</span> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
+        </div>
       </div>`;
   }).join("");
 
   grid.innerHTML=html;
-  bindDefToggles(grid); // safe even if no .def-term in cards
+  bindDefToggles(grid);
 
-  // Click card => open LIGHTBOX
   list.forEach((p,idx)=>{
     const id="card_"+idx;
     const el=document.getElementById(id);
     if(!el) return;
-
     el.addEventListener('click',()=>{
-      const name     = p["FULL NAME"] || "";
-      const photoKey = (p["PHOTO"] || "").trim();
-      const hasPhoto = !!photoKey;
-      const photoURL = hasPhoto
-        ? `https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png`
-        : "";
+      const name=p["FULL NAME"]||"";
+      const photoKey=(p["PHOTO"]||"").trim();
+      const hasPhoto=!!photoKey;
+      const photoURL=hasPhoto?`https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png`:"";
+      const dispose=p[H_DISPOSE]||"";
+      const price=p[H_PRICE]||"";
+      const value=p[H_VALUE]||"";
+      const comfort=p[H_COMFORT]||"";
+      const material=p[H_MAT]||"";
+      const promo=(p[H_PROMO]||"").trim();
+      const hasPromo=promo.length>0;
+      const hoursRaw=p[H_HOURS]||"";
+      const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
+      const comfortNice=niceCase(comfort);
+      const materialNice=mapMaterial(material);
+      const isLoose=/\bloose\b/i.test(name);
+      const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
+      const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
 
-      const dispose  = p[H_DISPOSE] || "";
-      const price    = p[H_PRICE]   || "";
-      const value    = p[H_VALUE]   || "";
-      const comfort  = p[H_COMFORT] || "";
-      const material = p[H_MAT]     || "";
-      const promo    = (p[H_PROMO]  || "").trim();
-      const hasPromo = promo.length > 0;
-      const hoursRaw = p[H_HOURS]   || "";
-      const hours    = hoursRaw ? `${parseFloat(hoursRaw)} hrs` : "";
-
-      const comfortNice  = niceCase(comfort);
-      const materialNice = mapMaterial(material);
-
-const nameForLoose = name || "";
-const isLoose = /\bloose\b/i.test(nameForLoose);
-const leadDays = parseInt(p["LEAD_TIME"] || "3", 10);
-const etaText  = computeETA(leadDays, { looseStart: isLoose }).text;
-
-
-
-      const expandedHTML = `
+      const expandedHTML=`
         <div class="zoom-card-flex">
           <div class="photo" style="text-align:center;">
-            ${
-              hasPhoto
-                ? `<img src="${photoURL}" alt="${name}">`
-                : `<div style="width:500px;max-width:100%;height:333px;display:flex;align-items:center;justify-content:center;color:#666;border:1px dashed #ccc;border-radius:10px;margin:0 auto;">No photo</div>`
+            ${hasPhoto
+              ? `<img src="${photoURL}" alt="${name}">`
+              : `<div style="width:100%;height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);">No photo</div>`
             }
           </div>
           <div class="details">
-            <div style="font-weight:700; margin-bottom:4px;">${name}</div>
+            <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--text); margin-bottom:6px;">${name}</div>
             <div><b>Dispose Period:</b> ${dispose}</div>
-<div><b>Estimated Ready:</b> ${etaText} <br><i>* May take more than a month if no stock</i></div>
-
-
-            <!-- SHORT label + inline value always visible -->
+            <div><b>Estimated Ready:</b> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
             <div class="def-row">
-              <b class="def-term"
-                 data-long="Premium : Enhanced coating & comfort thru newer and premium technology.<br> Good : Medium range that balances between cost and technology.<br> Basic : Basic quality that focuses on health and safety only.">
-                 Comfort
-              </b>: <span class="def-value">${comfortNice}</span>
+              <b class="def-term" data-long="<strong>Premium:</strong> Enhanced coating &amp; comfort through newer and premium technology.<br><strong>Good:</strong> Medium range balancing cost and technology.<br><strong>Basic:</strong> Focuses on health and safety only.">Comfort</b>: <span>${comfortNice}</span>
               <div class="def-extra"></div>
             </div>
-
             <div class="def-row">
-              <b class="def-term"
-                 data-long="Hydrogel : First generation material. Still popular among short hours wearer.<br> Silicone Hydrogel : Modern material that embeds silicone for much higher oxygen transmissibility. Better for long daily wear.">
-                 Material
-              </b>: <span class="def-value">${materialNice}</span>
+              <b class="def-term" data-long="<strong>Hydrogel:</strong> First generation material. Popular among short-hours wearers.<br><strong>Silicone Hydrogel:</strong> Modern material with embedded silicone for higher oxygen transmissibility. Better for long daily wear.">Material</b>: <span>${materialNice}</span>
               <div class="def-extra"></div>
             </div>
-
-            <div><b>Estimated wearing hours:</b> ${hours || "-"}</div>
-            <div><b>Average cost per pair:</b> ${value || "-"}</div>
-            <div style="height:10px"></div>
+            <div><b>Estimated wearing hours:</b> ${hours||"—"}</div>
+            <div><b>Average cost per pair:</b> ${value||"—"}</div>
+            <hr style="border:none;border-top:1px solid var(--border);margin:8px 0;">
             <div><b>Price Per Pack & Qty:</b> ${price}</div>
-            <div><b>Current Promo:</b> ${hasPromo ? promo : "Not at the moment"}</div>
+            <div><b>Current Promo:</b> <span style="color:${hasPromo?'var(--danger)':'var(--text-muted)'}">${hasPromo?promo:"Not at the moment"}</span></div>
           </div>
-        </div>
-      `;
+        </div>`;
 
       if(window.__openCardZoom){
         window.__openCardZoom(expandedHTML);
-        // Bind short/long toggles inside the lightbox (specific!)
         bindDefToggles(document.getElementById('zoomCardBox'));
       }
     });
@@ -1597,166 +1568,86 @@ const etaText  = computeETA(leadDays, { looseStart: isLoose }).text;
 </script>
 
 <script>
-/* =========================
-   Lightbox: CARD MODE
-========================= */
-document.addEventListener('DOMContentLoaded',function(){
+/* Lightbox */
+document.addEventListener('DOMContentLoaded', function(){
   const overlay=document.getElementById('imgZoom');
   const cardBox=document.getElementById('zoomCardBox');
   if(!overlay||!cardBox) return;
-
-  function openCard(html){
-    cardBox.innerHTML=html;
-    cardBox.style.display='block';
-    overlay.classList.add('open');
-  }
-  function closeAll(){
-    overlay.classList.remove('open');
-    cardBox.innerHTML='';
-    cardBox.style.display='none';
-  }
-
+  function openCard(html){ cardBox.innerHTML=html; cardBox.style.display='block'; overlay.classList.add('open'); }
+  function closeAll(){ overlay.classList.remove('open'); cardBox.innerHTML=''; cardBox.style.display='none'; }
   overlay.addEventListener('click',(e)=>{ if(e.target===overlay) closeAll(); });
   document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&overlay.classList.contains('open')) closeAll(); });
-
   window.__openCardZoom=openCard;
   window.__closeZoom=closeAll;
 });
 </script>
 
-
-
-
-
 <script>
-/* =========================
-   Converter (unchanged core)
-========================= */
+/* Converter */
 (function(){
   const CL_CYL_STEPS=[-0.75,-1.25,-1.75,-2.25,-2.75];
   let latest={re:null,le:null};
-
-  function glassesToCL(F){ const d=0.01; return F/(1 - d*F); }
+  function glassesToCL(F){ const d=0.01; return F/(1-d*F); }
   function r025(x){ return Math.round(x/0.25)*0.25; }
-function roundUp025(x){
-  return Math.ceil(x / 0.25) * 0.25;
-}
-
+  function roundUp025(x){ return Math.ceil(x/0.25)*0.25; }
   function fmt(x){ x=parseFloat(x)||0; const v=Math.round(x*100)/100; const s=v>=0?"+":""; return s+v.toFixed(2); }
   function nearest(arr,val){ return arr.reduce((b,v)=>Math.abs(v-val)<Math.abs(b-val)?v:b,arr[0]); }
-  function roundDown025(x){ return Math.floor(x/0.25)*0.25; }
 
   document.querySelectorAll("#specToCL input[type=number]").forEach(inp=>{
     inp.addEventListener("blur",()=>{
       let v=parseFloat(inp.value);
       if(isNaN(v)){inp.value="";return;}
-      if(inp.id.includes("axis")){
-        v=Math.round(v); if(v<=0)v=180; if(v>180)v=v%180||180;
-        inp.value=v;
-      }else{
-        v=r025(v);
-inp.value = v.toFixed(2);      }
+      if(inp.id.includes("axis")){ v=Math.round(v); if(v<=0)v=180; if(v>180)v=v%180||180; inp.value=v; }
+      else { v=r025(v); inp.value=v.toFixed(2); }
     });
   });
 
-function flatterAxis(a){
-  // Ensure valid number 0–180
-  a = parseFloat(a) || 0;
-  if (a <= 0) a = 180;
-
-  // Round to nearest 10 degrees (standard clinical rule)
-  const rounded = Math.round(a / 10) * 10;
-
-  // Keep within 1–180
-  const fixed = (rounded > 180) ? 180 : rounded;
-
-  // Generate a small ±10° range around the rounded axis
-  let t1 = fixed - 10;
-  let t2 = fixed + 10;
-  if (t1 < 1) t1 = 180 + t1; // wrap around
-  if (t2 > 180) t2 = t2 - 180;
-
-  return [fixed, t1, t2];
-}
-
-
-// NEW rounding rule
-function roundClipDiff(x){
-  return Math.round(x/0.50)*0.50;
-}
-
-function convertOne(S, C, A) {
-  S = parseFloat(S) || 0;
-  C = parseFloat(C) || 0;
-  A = parseFloat(A) || 0;
-
-  const total = S + C;
-  const convS = glassesToCL(S);
-  const convT = glassesToCL(total);
-  const rawCyl = convT - convS;
-  const SE = convS + rawCyl / 2;
-
-  const rS = r025(convS);
-  const rClipC = nearest(CL_CYL_STEPS, rawCyl);
-  const [axis1, axis2] = flatterAxis(A);
-
-  // NEW logic
-  const clipDiffRounded = roundClipDiff(rawCyl - rClipC);
-  const correctedSphere = roundUp025(rS + clipDiffRounded / 2);
-
-  if (Math.abs(rawCyl) < 0.75) {
-    return {
-      type: "sph",
-      sph: roundUp025(SE),
-      cyl: 0,
-      axis: null
-    };
+  function flatterAxis(a){
+    a=parseFloat(a)||0; if(a<=0) a=180;
+    const rounded=Math.round(a/10)*10;
+    const fixed=(rounded>180)?180:rounded;
+    let t1=fixed-10; let t2=fixed+10;
+    if(t1<1) t1=180+t1;
+    if(t2>180) t2=t2-180;
+    return [fixed,t1,t2];
   }
 
-  return {
-    type: "toric",
+  function roundClipDiff(x){ return Math.round(x/0.50)*0.50; }
 
-    t1: { S: correctedSphere, C: rClipC, A: axis1 },
-    t2: { S: correctedSphere, C: rClipC, A: axis2 },
-
-t3: {
-  S: correctedSphere - 0.25,
-  C: rClipC + 0.50,   // add +0.50 = more plus
-  A: axis1
-},
-
-
-
-    SE: roundUp025(SE)
-  };
-}
-
+  function convertOne(S,C,A){
+    S=parseFloat(S)||0; C=parseFloat(C)||0; A=parseFloat(A)||0;
+    const total=S+C;
+    const convS=glassesToCL(S);
+    const convT=glassesToCL(total);
+    const rawCyl=convT-convS;
+    const SE=convS+rawCyl/2;
+    const rS=r025(convS);
+    const rClipC=nearest(CL_CYL_STEPS,rawCyl);
+    const [axis1,axis2]=flatterAxis(A);
+    const clipDiffRounded=roundClipDiff(rawCyl-rClipC);
+    const correctedSphere=roundUp025(rS+clipDiffRounded/2);
+    if(Math.abs(rawCyl)<0.75){ return {type:"sph",sph:roundUp025(SE),cyl:0,axis:null}; }
+    return {
+      type:"toric",
+      t1:{S:correctedSphere,C:rClipC,A:axis1},
+      t2:{S:correctedSphere,C:rClipC,A:axis2},
+      t3:{S:correctedSphere-0.25,C:rClipC+0.50,A:axis1},
+      SE:roundUp025(SE)
+    };
+  }
 
   function display(side,data){
     const div=document.getElementById(side==="re"?"reResult":"leResult");
     if(!div)return;
-
-    if(data.type==="sph"){
-      div.innerHTML=`${side.toUpperCase()} Spherical : S${fmt(data.sph)}`;
-      return;
-    }else{
-      const t=(t,n)=>`${side.toUpperCase()} Toric ${n} : S${fmt(t.S)} C${fmt(t.C)} ×${t.A}`;
-      const se=`${side.toUpperCase()} Spherical : S${fmt(data.SE)}`;
-      div.innerHTML=[t(data.t1,1),t(data.t2,2),t(data.t3,3),se].join("<br>");
-    }
+    if(data.type==="sph"){ div.innerHTML=`${side.toUpperCase()} Spherical : S${fmt(data.sph)}`; return; }
+    const t=(t,n)=>`${side.toUpperCase()} Toric ${n} : S${fmt(t.S)} C${fmt(t.C)} ×${t.A}`;
+    const se=`${side.toUpperCase()} Spherical : S${fmt(data.SE)}`;
+    div.innerHTML=[t(data.t1,1),t(data.t2,2),t(data.t3,3),se].join("<br>");
   }
 
   document.getElementById("convertBtn").addEventListener("click",()=>{
-    const re=convertOne(
-      document.getElementById("sph-re").value,
-      document.getElementById("cyl-re").value,
-      document.getElementById("axis-re").value
-    );
-    const le=convertOne(
-      document.getElementById("sph-le").value,
-      document.getElementById("cyl-le").value,
-      document.getElementById("axis-le").value
-    );
+    const re=convertOne(document.getElementById("sph-re").value,document.getElementById("cyl-re").value,document.getElementById("axis-re").value);
+    const le=convertOne(document.getElementById("sph-le").value,document.getElementById("cyl-le").value,document.getElementById("axis-le").value);
     display("re",re); display("le",le);
     latest.re=re; latest.le=le;
   });
@@ -1764,16 +1655,15 @@ t3: {
   function autofillSet(set){
     const reBox=document.getElementById("searchRE");
     const leBox=document.getElementById("searchLE");
-    if(!reBox||!leBox)return;
+    if(!reBox||!leBox) return;
     const f=(d)=>{
-      if(!d)return"";
+      if(!d) return "";
       if(d.type==="sph") return `S${fmt(d.sph)} C-0.00`;
       const sel=d[set];
       if(!sel) return `S${fmt(d.SE)}`;
       return `S${fmt(sel.S)} C${fmt(sel.C)} x${sel.A}`;
     };
-    reBox.value=f(latest.re);
-    leBox.value=f(latest.le);
+    reBox.value=f(latest.re); leBox.value=f(latest.le);
   }
 
   document.getElementById("auto1").addEventListener("click",()=>autofillSet("t1"));
@@ -1783,25 +1673,12 @@ t3: {
 })();
 </script>
 
-
-
-
-
-
-
-
-
-
-
 <script>
-/* =========================
-   Pro Mode (hide in Simple): #specToCL, #q4, #q5
-========================= */
+/* Pro mode toggle */
 (function(){
   let isProfessional=false;
   const btn=document.getElementById('modeToggleBtn');
   const proSelectors=['#specToCL','#q4','#q5'];
-
   function setMode(){
     proSelectors.forEach(sel=>{
       const el=document.querySelector(sel);
@@ -1811,229 +1688,183 @@ t3: {
     });
     btn.textContent=isProfessional?'Switch to Simple Mode':'Switch to Professional Mode';
   }
-
   btn.addEventListener('click',()=>{ isProfessional=!isProfessional; setMode(); });
-  setMode(); // start simple
+  setMode();
 })();
 </script>
 
-<!-- 🔍 Lightbox root (card mode) -->
-<div id="imgZoom" aria-modal="true" role="dialog">
-  <div class="inner">
-    <div id="zoomCardBox"></div>
-    <div class="hint">Tap outside or press Esc to close</div>
-  </div>
-</div>
-
-
-
-
 <script>
-/* =========================
-   Photo Zoom inside Lightbox
-========================= */
-document.addEventListener('click', function (e) {
-  // Only act when clicking a photo INSIDE zoomCardBox
-  const cardBox = document.getElementById('zoomCardBox');
-  if (!cardBox.contains(e.target)) return;
-
-  const img = e.target.closest('img');
-  if (!img) return;
-
-  // Create overlay
-  const overlay = document.createElement('div');
-  overlay.id = 'photoZoomOverlay';
-  overlay.style.position = 'fixed';
-  overlay.style.inset = '0';
-  overlay.style.background = 'rgba(0,0,0,0.9)';
-  overlay.style.display = 'flex';
-  overlay.style.alignItems = 'center';
-  overlay.style.justifyContent = 'center';
-  overlay.style.zIndex = '10001';
-  overlay.style.cursor = 'zoom-out';
-
-  // Clone and enlarge image
-  const big = img.cloneNode(true);
-  big.style.maxWidth = '80vw';
-  big.style.maxHeight = '85vh';
-  big.style.borderRadius = '12px';
-  big.style.boxShadow = '0 0 25px rgba(0,0,0,0.6)';
-  big.style.border = '2px solid #fff';
+/* Photo zoom inside lightbox */
+document.addEventListener('click', function(e){
+  const cardBox=document.getElementById('zoomCardBox');
+  if(!cardBox.contains(e.target)) return;
+  const img=e.target.closest('img');
+  if(!img) return;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10001;cursor:zoom-out;';
+  const big=img.cloneNode(true);
+  big.style.cssText='max-width:80vw;max-height:85vh;border-radius:12px;box-shadow:0 0 40px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.2);';
   overlay.appendChild(big);
-
-  // Close when clicking anywhere outside image
-  overlay.addEventListener('click', function (ev) {
-    if (ev.target === overlay) overlay.remove();
-  });
-
+  overlay.addEventListener('click',(ev)=>{ if(ev.target===overlay) overlay.remove(); });
   document.body.appendChild(overlay);
 });
 </script>
 
-
-
-
-
-
-
-
-
-
-
-
 <script>
-/* =========================
-   Lens Comparison (Compare button only)
-========================= */
-let selectedCards = []; // store selected products
-
-function toggleCompare(cardEl, product, btn) {
-  const id = product["FULL NAME"] || "";
-  const isSelected = selectedCards.find(p => p["FULL NAME"] === id);
-
-  if (isSelected) {
-    // deselect
-    selectedCards = selectedCards.filter(p => p["FULL NAME"] !== id);
-    cardEl.style.outline = "";
-    btn.textContent = "Compare";
+/* Comparison */
+let selectedCards=[];
+function toggleCompare(cardEl,product,btn){
+  const id=product["FULL NAME"]||"";
+  const isSelected=selectedCards.find(p=>p["FULL NAME"]===id);
+  if(isSelected){
+    selectedCards=selectedCards.filter(p=>p["FULL NAME"]!==id);
+    cardEl.style.outline="";
+    btn.textContent="Compare";
   } else {
-    if (selectedCards.length >= 2) return; // block 3rd
+    if(selectedCards.length>=2) return;
     selectedCards.push(product);
-    cardEl.style.outline = "3px solid #0b3d2e";
-    btn.textContent = "Remove";
+    cardEl.style.outline="2px solid var(--accent)";
+    btn.textContent="Remove";
   }
   updateCompareView();
 }
-
-function updateCompareView() {
-  const compBox = document.getElementById("compareBox") || createCompareBox();
-  if (selectedCards.length !== 2) {
-    compBox.style.display = "none";
-    return;
-  }
-
-  const [a, b] = selectedCards;
-  const priceA = a["1 BOX PRICE & UNIT"] || "-";
-  const priceB = b["1 BOX PRICE & UNIT"] || "-";
-  const hrsA = a["WEARING_HOURS"] ? `${parseFloat(a["WEARING_HOURS"])} hrs` : "-";
-  const hrsB = b["WEARING_HOURS"] ? `${parseFloat(b["WEARING_HOURS"])} hrs` : "-";
-  const typeA = a["VISION (SPH, ASTIG, MF)"] || "-";
-  const typeB = b["VISION (SPH, ASTIG, MF)"] || "-";
-
-  const isLooseA = /\bloose\b/i.test(a["FULL NAME"] || "");
-  const isLooseB = /\bloose\b/i.test(b["FULL NAME"] || "");
-  const leadA = parseInt(a["LEAD_TIME"] || "3", 10);
-  const leadB = parseInt(b["LEAD_TIME"] || "3", 10);
-  const etaA = computeETA(leadA, { looseStart: isLooseA }).text;
-  const etaB = computeETA(leadB, { looseStart: isLooseB }).text;
-
-  compBox.innerHTML = `
-    <h3 style="margin:0 0 8px;text-align:center;">Comparison</h3>
-    <table style="width:100%;border-collapse:collapse;font-size:12px;">
-      <tr><th style="text-align:left;">Field</th><th>${a["FULL NAME"]}</th><th>${b["FULL NAME"]}</th></tr>
+function updateCompareView(){
+  const compBox=document.getElementById("compareBox")||createCompareBox();
+  if(selectedCards.length!==2){ compBox.style.display="none"; return; }
+  const [a,b]=selectedCards;
+  const priceA=a["1 BOX PRICE & UNIT"]||"—";
+  const priceB=b["1 BOX PRICE & UNIT"]||"—";
+  const hrsA=a["WEARING_HOURS"]?`${parseFloat(a["WEARING_HOURS"])} hrs`:"—";
+  const hrsB=b["WEARING_HOURS"]?`${parseFloat(b["WEARING_HOURS"])} hrs`:"—";
+  const typeA=a["VISION (SPH, ASTIG, MF)"]||"—";
+  const typeB=b["VISION (SPH, ASTIG, MF)"]||"—";
+  const isLooseA=/\bloose\b/i.test(a["FULL NAME"]||"");
+  const isLooseB=/\bloose\b/i.test(b["FULL NAME"]||"");
+  const leadA=parseInt(a["LEAD_TIME"]||"3",10);
+  const leadB=parseInt(b["LEAD_TIME"]||"3",10);
+  const etaA=computeETA(leadA,{looseStart:isLooseA}).text;
+  const etaB=computeETA(leadB,{looseStart:isLooseB}).text;
+  compBox.innerHTML=`
+    <h3 style="margin:0 0 12px; font-family:var(--font-display);">Comparison</h3>
+    <table>
+      <tr><th>Field</th><th>${a["FULL NAME"]}</th><th>${b["FULL NAME"]}</th></tr>
       <tr><td><b>Price</b></td><td>${priceA}</td><td>${priceB}</td></tr>
-      <tr><td><b>Estimated Comfy Hours</b></td><td>${hrsA}</td><td>${hrsB}</td></tr>
-      <tr><td><b>Estimated Ready</b></td><td>${etaA}</td><td>${etaB}</td></tr>
+      <tr><td><b>Wearing Hours</b></td><td>${hrsA}</td><td>${hrsB}</td></tr>
+      <tr><td><b>Est. Ready</b></td><td>${etaA}</td><td>${etaB}</td></tr>
       <tr><td><b>Type</b></td><td>${typeA}</td><td>${typeB}</td></tr>
     </table>
-    <p style="font-size:11px;text-align:center;margin-top:8px;opacity:.7;">
-      Click <b>Remove</b> on either lens to clear comparison.
-    </p>
-  `;
-  compBox.style.display = "block";
+    <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px;">
+      Click <strong>Remove</strong> on either lens to clear comparison.
+    </p>`;
+  compBox.style.display="block";
 }
-
-function createCompareBox() {
-  const box = document.createElement("div");
-  box.id = "compareBox";
-  box.style.background = "#fff";
-  box.style.border = "1px solid #ccc";
-  box.style.borderRadius = "10px";
-  box.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-  box.style.padding = "12px";
-  box.style.margin = "20px 0";
-document.getElementById("compareArea").appendChild(box);
+function createCompareBox(){
+  const box=document.createElement("div");
+  box.id="compareBox";
+  box.style.display="none";
+  document.getElementById("compareArea").appendChild(box);
   return box;
 }
-
-/* Hook Compare button into cards */
-const oldBuildCards = buildCards;
-buildCards = function(list){
+const oldBuildCards=buildCards;
+buildCards=function(list){
   oldBuildCards(list);
-
-  list.forEach((p, idx)=>{
-    const card = document.getElementById("card_"+idx);
+  list.forEach((p,idx)=>{
+    const card=document.getElementById("card_"+idx);
     if(!card) return;
-
-    // Add Compare button
-    const btn = document.createElement("button");
-    btn.textContent = "Compare";
-    btn.style.marginTop = "6px";
-    btn.style.fontSize = "11px";
-    btn.addEventListener("click", (e)=>{
-      e.stopPropagation(); // prevent zoom
-      toggleCompare(card, p, btn);
-    });
+    const btn=document.createElement("button");
+    btn.textContent="Compare";
+    btn.className="btn-outline";
+    btn.style.marginTop="8px";
+    btn.style.fontSize="11px";
+    btn.addEventListener("click",(e)=>{ e.stopPropagation(); toggleCompare(card,p,btn); });
     card.appendChild(btn);
   });
 };
 </script>
 
-
-
-
-
 <script>
-  document.getElementById('resetBtn')?.addEventListener('click', () => {
-    location.reload(); // hard refresh behavior is fine here
-  });
-</script>
+/* WhatsApp messaging */
+document.addEventListener("DOMContentLoaded",()=>{
+  const numberInput=document.getElementById("waNumber");
+  numberInput.addEventListener("input",updateCountryDisplay);
+});
 
+let history=[], redoStack=[];
+function saveState(){ const msg=document.getElementById("waMessage").value; history.push(msg); if(history.length>30) history.shift(); redoStack=[]; }
+function addPreset(text){ const box=document.getElementById("waMessage"); let current=box.value.trim(); saveState(); box.value=!current?text:`${current}\n\n${text}`; }
+function addPersonalPreset(){ const nameInput=document.getElementById("waName").value.trim(); const name=capitalizeName(nameInput)||"there"; addPreset(`Greetings from Kiara Optometry! Thank you for dropping by ${name}.`); }
+function addSet(setName){
+  const sets={ A:{label:"Set A - Vita Monthly Sph + 1 bottle Opti-free Puremoist 300ml",price:190}, B:{label:"Set B - Vita Monthly Astig + 1 bottle Opti-free Puremoist 300ml",price:220}, C:{label:"Set C - Oasys Biweekly Sph + 1 bottle Opti-free Puremoist 300ml",price:280}, D:{label:"Set D - Oasys Biweekly Astig + 1 bottle Opti-free Puremoist 300ml",price:350} };
+  const box=document.getElementById("waMessage"); const current=box.value.trim(); const set=sets[setName]; if(!set) return;
+  const newLine=current?"\n":""; box.value=`${current}${newLine}${set.label} - RM${set.price}`;
+}
+function totalUp(){
+  const box=document.getElementById("waMessage"); const text=box.value;
+  const prices={A:190,B:220,C:280,D:350};
+  const matches=text.match(/Set ([A-D])/g)||[];
+  let grandTotal=0; matches.forEach(m=>{ const set=m.split(" ")[1]; if(prices[set]) grandTotal+=prices[set]; });
+  if(grandTotal>0) addPreset(`Grand Total: RM ${grandTotal}`);
+  else alert("No sets selected yet.");
+}
+function undoMsg(){ if(!history.length) return; const box=document.getElementById("waMessage"); redoStack.push(box.value); box.value=history.pop()||""; }
+function redoMsg(){ if(!redoStack.length) return; const box=document.getElementById("waMessage"); history.push(box.value); box.value=redoStack.pop(); }
+function capitalizeName(name){ name=name.trim(); if(!name) return ""; return name.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" "); }
 
-
-
-
-
-<script>
-function toggleSpan(id){
-  const el = document.getElementById(id);
-  if (!el) return;
-
-  if (el.style.display === "none") {
-    el.style.display = "block";
-  } else {
-    el.style.display = "none";
-  }
+function detectCountry(num){
+  const countries=[
+    {code:"60",name:"Malaysia"},{code:"65",name:"Singapore"},{code:"62",name:"Indonesia"},{code:"63",name:"Philippines"},{code:"66",name:"Thailand"},{code:"84",name:"Vietnam"},{code:"673",name:"Brunei"},{code:"95",name:"Myanmar"},{code:"856",name:"Laos"},
+    {code:"81",name:"Japan"},{code:"82",name:"South Korea"},{code:"86",name:"China"},{code:"852",name:"Hong Kong"},{code:"853",name:"Macau"},{code:"886",name:"Taiwan"},
+    {code:"91",name:"India"},{code:"92",name:"Pakistan"},{code:"94",name:"Sri Lanka"},{code:"880",name:"Bangladesh"},{code:"977",name:"Nepal"},
+    {code:"61",name:"Australia"},{code:"64",name:"New Zealand"},
+    {code:"971",name:"UAE"},{code:"966",name:"Saudi Arabia"},{code:"965",name:"Kuwait"},{code:"968",name:"Oman"},{code:"973",name:"Bahrain"},{code:"974",name:"Qatar"},{code:"962",name:"Jordan"},
+    {code:"27",name:"South Africa"},{code:"234",name:"Nigeria"},{code:"254",name:"Kenya"},{code:"20",name:"Egypt"},
+    {code:"44",name:"United Kingdom"},{code:"33",name:"France"},{code:"49",name:"Germany"},{code:"34",name:"Spain"},{code:"39",name:"Italy"},{code:"31",name:"Netherlands"},{code:"1",name:"United States / Canada"},{code:"55",name:"Brazil"},
+  ];
+  num=num.trim().replace(/[^\d+]/g,""); if(num.startsWith("+")) num=num.slice(1);
+  const match=countries.find(c=>num.startsWith(c.code));
+  if(!num) return {name:"Enter number"};
+  return match||{name:"Unknown Country"};
+}
+function updateCountryDisplay(){ const num=document.getElementById("waNumber").value; const info=detectCountry(num); document.getElementById("countryDisplay").textContent=info.name; }
+function formatPhone(num){ num=num.trim(); if(num.startsWith("+")) num=num.slice(1); num=num.replace(/[^\d]/g,""); if(num.startsWith("0")) return "6"+num; return num; }
+function openWhatsApp(){
+  let name=document.getElementById("waName").value.trim(); let num=document.getElementById("waNumber").value.trim(); const msg=document.getElementById("waMessage").value.trim();
+  if(!num) return alert("Please enter a phone number");
+  name=capitalizeName(name); document.getElementById("waName").value=name;
+  num=formatPhone(num); document.getElementById("waNumber").value=num;
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`,"_blank");
 }
 </script>
 
+<script>
+/* RX Adjust */
+function adjustSingle(eye,type,value){
+  const id=eye+type.charAt(0).toUpperCase()+type.slice(1);
+  const field=document.getElementById(id);
+  if(type==="axis"){ let newVal=parseInt(field.value)+value; if(newVal<=0) newVal+=180; if(newVal>180) newVal-=180; field.value=newVal===0?180:newVal; }
+  else { field.value=(parseFloat(field.value)+value).toFixed(2); }
+}
+function addRxToMessage(){
+  const rSph=parseFloat(document.getElementById("rSph").value).toFixed(2);
+  const rCylVal=parseFloat(document.getElementById("rCyl").value).toFixed(2);
+  const lSph=parseFloat(document.getElementById("lSph").value).toFixed(2);
+  const lCylVal=parseFloat(document.getElementById("lCyl").value).toFixed(2);
+  let rAxis=parseInt(document.getElementById("rAxis").value);
+  let lAxis=parseInt(document.getElementById("lAxis").value);
+  if(rCylVal==0) rAxis="-"; else if(rAxis===0) rAxis=180;
+  if(lCylVal==0) lAxis="-"; else if(lAxis===0) lAxis=180;
+  const rCyl=rCylVal==0?"-":rCylVal; const lCyl=lCylVal==0?"-":lCylVal;
+  addPreset(`R :  ${rSph} /  ${rCyl} × ${rAxis}\nL :  ${lSph} /  ${lCyl} × ${lAxis}`);
+}
+function clearRx(){ ["rSph","rCyl","rAxis","lSph","lCyl","lAxis"].forEach(id=>document.getElementById(id).value=id.includes("Axis")?0:"0.00"); }
+</script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<script>
+/* Reset */
+document.getElementById('resetBtn')?.addEventListener('click',()=>location.reload());
+/* toggleSpan */
+function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; el.style.display=(el.style.display==="none")?"block":"none"; }
+</script>
 
 </body>
-
-
-
-
-
 </html>
-
-
-
-
