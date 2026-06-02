@@ -993,10 +993,15 @@ button.btn-green:hover:not(:disabled) {
       <div class="toolbar">
         <button id="promoBtn" style="display:none;" disabled>Show Promo Only</button>
         <button id="showBtn" disabled>Loading…</button>
+<button style="background-color:lightblue; color:black" onclick="toggleDiv()">Toggle Filter</button>
+
         <span id="btnText" style="opacity:0.6; font-size:12px;"></span>
         <button id="resetBtn" class="btn-outline">↺ Reset</button>
         <button id="modeToggleBtn" class="btn-soft">Switch to Professional Mode</button>
       </div>
+
+
+<div id="myDiv">
 
       <!-- Q1 -->
       <div class="section" id="q1">
@@ -1110,6 +1115,14 @@ button.btn-green:hover:not(:disabled) {
           </div>
         </div>
       </div>
+</div>
+
+<script>
+function toggleDiv() {
+  const div = document.getElementById("myDiv");
+  div.style.display = div.style.display === "none" ? "block" : "none";
+}
+</script>
 
       <!-- Sort bar -->
       <div id="sortBar" style="display:none;">
