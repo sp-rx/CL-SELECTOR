@@ -771,7 +771,13 @@ button.btn-green:hover:not(:disabled) {
     <h2>Contact Lens <em>Selector</em></h2>
     <div class="header-rule"></div>
     <div class="header-actions">
-      <span class="toggle-link" onclick="toggleSpan('promo')">Show / Hide Promotions</span>
+<button style="background-color:lightblue; color:black" onclick="toggleSpan('promo')">
+  Show / Hide Promotions
+</button>
+
+
+<button style="background-color:lightblue; color:black" onclick="toggleDiv2()">Show Contact Bar</button>
+
     </div>
   </div>
 
@@ -789,7 +795,7 @@ button.btn-green:hover:not(:disabled) {
   </div>
 
   <!-- WHATSAPP SECTION -->
-  <div class="section">
+  <div class="section" id="myDiv2" style="display:none">
     <div class="badge-section-label"><span>WhatsApp Messaging</span></div>
     <div class="wa-section">
       <input id="waName" type="text" placeholder="Enter patient name" style="width:90%; text-align:center; border-radius:8px;">
@@ -1007,11 +1013,11 @@ button.btn-green:hover:not(:disabled) {
       <div class="toolbar">
         <button id="promoBtn" style="display:none;" disabled>Show Promo Only</button>
         <button id="showBtn" disabled>Loading…</button>
-<button style="background-color:lightblue; color:black" onclick="toggleDiv()">Toggle Filter</button>
+<button style="background-color:lightblue; color:black" onclick="toggleDiv()">Show Filters</button>
+
 
         <span id="btnText" style="opacity:0.6; font-size:12px;"></span>
         <button id="resetBtn" class="btn-outline">↺ Reset</button>
-        <button id="modeToggleBtn" class="btn-soft">Switch to Professional Mode</button>
       </div>
 
 
@@ -1054,6 +1060,9 @@ button.btn-green:hover:not(:disabled) {
           <label><input type="checkbox" name="q6" value="NOT_LOOSE"> Boxes</label>
         </div>
       </div>
+
+        <button id="modeToggleBtn" class="btn-soft">See more filters</button>
+
 
       <!-- Q4 (pro) -->
       <div class="section2 simple-hide" id="q4">
@@ -1118,8 +1127,12 @@ function toggleDiv() {
   const div = document.getElementById("myDiv");
   div.style.display = div.style.display === "none" ? "block" : "none";
 }
+function toggleDiv2() {
+  const div = document.getElementById("myDiv2");
+  div.style.display = div.style.display === "none" ? "block" : "none";
+}
 </script>
-
+</div>
       <!-- Sort bar -->
       <div id="sortBar" style="display:none;">
         <strong style="color:var(--text-mid);">Sort:</strong>
@@ -1695,7 +1708,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if(isProfessional) el.classList.remove('simple-hide');
       else el.classList.add('simple-hide');
     });
-    btn.textContent=isProfessional?'Switch to Simple Mode':'Switch to Professional Mode';
+    btn.textContent=isProfessional?'See less filters':'See more filters';
   }
   btn.addEventListener('click',()=>{ isProfessional=!isProfessional; setMode(); });
   setMode();
