@@ -980,6 +980,47 @@ button.btn-green:hover:not(:disabled) {
   <!-- SEARCH SECTION -->
   <div id="targetSection">
 
+     <div class="section2" id="specToCL">
+       <h2>  <span style="cursor:pointer; user-select:none" onclick="toggleDiv3()">Spectacle to Contact Lens Power Converter
+ </span></h2>
+
+<div id="myDiv3" style="display:none">
+        <div style="display:flex; align-items:flex-end; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <strong style="color:var(--text-mid);">RE Specs:</strong>
+            Sph <input id="sph-re" type="number" step="0.25" style="width:70px; text-align:center;">
+            Cyl <input id="cyl-re" type="number" step="0.25" max="0" style="width:70px; text-align:center;">
+            Axis <input id="axis-re" type="number" min="0" max="180" step="1" style="width:70px; text-align:center;">
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <strong style="color:var(--text-mid);">LE Specs:</strong>
+            Sph <input id="sph-le" type="number" step="0.25" style="width:70px; text-align:center;">
+            Cyl <input id="cyl-le" type="number" step="0.25" max="0" style="width:70px; text-align:center;">
+            Axis <input id="axis-le" type="number" min="0" max="180" step="1" style="width:70px; text-align:center;">
+          </div>
+          <button id="convertBtn">Convert</button>
+        </div>
+        <div style="display:flex; gap:14px; margin-top:14px; align-items:flex-start; flex-wrap:wrap;">
+          <div id="clOut">
+            <div>
+              <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">RE Results</div>
+              <div id="reResult" style="height:140px, font-size:12px; line-height:2.8;"></div>
+            </div>
+            <div>
+              <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">LE Results</div>
+              <div id="leResult" style="height:140px; font-size:12px; line-height:2.8;"></div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <button style="margin-top:40px" id="auto1">Auto-fill 1</button>
+            <button id="auto2">Auto-fill 2</button>
+            <button id="auto3">Auto-fill 3</button>
+            <button id="autoSE" class="btn-outline">Auto-fill SE</button>
+          </div>
+        </div>
+</div>
+      </div>
+
     <div class="section" id="searchSec">
       <div class="badge-section-label"><span>Lens Search</span></div>
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
@@ -1084,42 +1125,7 @@ button.btn-green:hover:not(:disabled) {
       </div>
 
       <!-- Converter (pro) -->
-      <div class="section2 simple-hide" id="specToCL">
-        <h2>Spectacle → Contact Lens Power Converter</h2>
-        <div style="display:flex; align-items:flex-end; flex-wrap:wrap; gap:12px;">
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <strong style="color:var(--text-mid);">RE Specs:</strong>
-            Sph <input id="sph-re" type="number" step="0.25" style="width:70px; text-align:center;">
-            Cyl <input id="cyl-re" type="number" step="0.25" style="width:70px; text-align:center;">
-            Axis <input id="axis-re" type="number" min="0" max="180" step="1" style="width:70px; text-align:center;">
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <strong style="color:var(--text-mid);">LE Specs:</strong>
-            Sph <input id="sph-le" type="number" step="0.25" style="width:70px; text-align:center;">
-            Cyl <input id="cyl-le" type="number" step="0.25" style="width:70px; text-align:center;">
-            Axis <input id="axis-le" type="number" min="0" max="180" step="1" style="width:70px; text-align:center;">
-          </div>
-          <button id="convertBtn">Convert</button>
-        </div>
-        <div style="display:flex; gap:14px; margin-top:14px; align-items:flex-start; flex-wrap:wrap;">
-          <div id="clOut">
-            <div>
-              <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">RE Results</div>
-              <div id="reResult" style="font-size:12px; line-height:1.8;"></div>
-            </div>
-            <div>
-              <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">LE Results</div>
-              <div id="leResult" style="font-size:12px; line-height:1.8;"></div>
-            </div>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:7px;">
-            <button id="auto1">Auto-fill 1</button>
-            <button id="auto2">Auto-fill 2</button>
-            <button id="auto3">Auto-fill 3</button>
-            <button id="autoSE" class="btn-outline">Auto-fill SE</button>
-          </div>
-        </div>
-      </div>
+ 
 </div>
 
 <script>
@@ -1131,6 +1137,11 @@ function toggleDiv2() {
   const div = document.getElementById("myDiv2");
   div.style.display = div.style.display === "none" ? "block" : "none";
 }
+function toggleDiv3() {
+  const div = document.getElementById("myDiv3");
+  div.style.display = div.style.display === "none" ? "block" : "none";
+}
+
 </script>
 </div>
       <!-- Sort bar -->
@@ -1619,6 +1630,14 @@ document.addEventListener('DOMContentLoaded', function(){
     inp.addEventListener("blur",()=>{
       let v=parseFloat(inp.value);
       if(isNaN(v)){inp.value="";return;}
+
+if(inp.id.includes("cyl")){
+  if(v > 0){
+    inp.value = "";
+    return;
+  }
+}
+
       if(inp.id.includes("axis")){ v=Math.round(v); if(v<=0)v=180; if(v>180)v=v%180||180; inp.value=v; }
       else { v=r025(v); inp.value=v.toFixed(2); }
     });
@@ -1631,7 +1650,11 @@ document.addEventListener('DOMContentLoaded', function(){
     let t1=fixed-10; let t2=fixed+10;
     if(t1<1) t1=180+t1;
     if(t2>180) t2=t2-180;
-    return [fixed,t1,t2];
+return [
+  fixed === 0 ? 180 : fixed,
+  t1 === 0 ? 180 : t1,
+  t2 === 0 ? 180 : t2
+];
   }
 
   function roundClipDiff(x){ return Math.round(x/0.50)*0.50; }
@@ -1662,8 +1685,11 @@ document.addEventListener('DOMContentLoaded', function(){
     const div=document.getElementById(side==="re"?"reResult":"leResult");
     if(!div)return;
     if(data.type==="sph"){ div.innerHTML=`${side.toUpperCase()} Spherical : S${fmt(data.sph)}`; return; }
-    const t=(t,n)=>`${side.toUpperCase()} Toric ${n} : S${fmt(t.S)} C${fmt(t.C)} ×${t.A}`;
-    const se=`${side.toUpperCase()} Spherical : S${fmt(data.SE)}`;
+const t=(t,n)=>{
+  return Math.abs(t.C) === 0.25
+    ? `${side.toUpperCase()} ${n} : S ${fmt(t.S)}`
+    : `${side.toUpperCase()} ${n} :  ${fmt(t.S)} /  ${fmt(t.C)} × ${t.A}`;
+};    const se=`${side.toUpperCase()} SE Only : ${fmt(data.SE)}`;
     div.innerHTML=[t(data.t1,1),t(data.t2,2),t(data.t3,3),se].join("<br>");
   }
 
@@ -1674,17 +1700,30 @@ document.addEventListener('DOMContentLoaded', function(){
     latest.re=re; latest.le=le;
   });
 
-  function autofillSet(set){
-    const reBox=document.getElementById("searchRE");
-    const leBox=document.getElementById("searchLE");
-    if(!reBox||!leBox) return;
-    const f=(d)=>{
-      if(!d) return "";
-      if(d.type==="sph") return `S${fmt(d.sph)} C-0.00`;
-      const sel=d[set];
-      if(!sel) return `S${fmt(d.SE)}`;
-      return `S${fmt(sel.S)} C${fmt(sel.C)} x${sel.A}`;
-    };
+function autofillSet(set){
+  const reBox=document.getElementById("searchRE");
+  const leBox=document.getElementById("searchLE");
+  if(!reBox||!leBox) return;
+
+  const f=(d)=>{
+    if(!d) return "";
+
+    if(d.type==="sph")
+      return `S${fmt(d.sph)}`;
+
+if(set === "SE")
+  return `S${fmt(d.SE)}`;
+
+const sel=d[set];
+
+if(!sel)
+  return "";
+
+if(Math.abs(sel.C) === 0.25)
+  return `S${fmt(sel.S)}`;
+
+return `S${fmt(sel.S)} C${fmt(sel.C)} x${sel.A}`;
+  };
     reBox.value=f(latest.re); leBox.value=f(latest.le);
   }
 
@@ -1700,7 +1739,7 @@ document.addEventListener('DOMContentLoaded', function(){
 (function(){
   let isProfessional=false;
   const btn=document.getElementById('modeToggleBtn');
-  const proSelectors=['#specToCL','#q4','#q5'];
+  const proSelectors=['#q4','#q5'];
   function setMode(){
     proSelectors.forEach(sel=>{
       const el=document.querySelector(sel);
