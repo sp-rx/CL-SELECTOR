@@ -787,8 +787,8 @@ button.btn-green:hover:not(:disabled) {
       <div class="section3" style="width:90%">
         <h3 class="text-center" style="margin-bottom:16px;">Current Promotions</h3>
         <div class="promo-images">
-          <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/acuvue_lens_promo.jpg" alt="Promo">
-          <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/o1d.jpg" alt="Promo 2">
+          <img src="https://sp-rx.github.io/CL-SELECTOR/acuvue_lens_promo.jpg" alt="Promo">
+          <img src="https://sp-rx.github.io/CL-SELECTOR/o1d.jpg" alt="Promo 2">
         </div>
       </div>
     </div>
@@ -1073,15 +1073,15 @@ button.btn-green:hover:not(:disabled) {
         </h2>
         <div id="rxIcons" class="rx-icons" style="display:none;">
           <label>
-            <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/SPH.png" alt="SPH">
+            <img src="https://sp-rx.github.io/CL-SELECTOR/SPH.png" alt="SPH">
             SPH lenses only have one prescription, e.g. −5.00 (indicated by D).
           </label>
           <label>
-            <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/ASTIG.png" alt="ASTIG">
+            <img src="https://sp-rx.github.io/CL-SELECTOR/ASTIG.png" alt="ASTIG">
             ASTIG lenses have 2 extra prescriptions, e.g. −1.75 and 030.
           </label>
           <label>
-            <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/MF.png" alt="MF">
+            <img src="https://sp-rx.github.io/CL-SELECTOR/MF.png" alt="MF">
             MF lenses have an ADD prescription, e.g. MID (LOW or HI).
           </label>
         </div>
@@ -1227,7 +1227,7 @@ function bindDefToggles(scope = document){
 
 <script>
 /* RESULTS ENGINE */
-const csvUrl = 'https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
+const csvUrl = 'https://sp-rx.github.io/CL-SELECTOR/CL%20DATABASE.csv';
 let products = []; let csvLoaded = false;
 
 const showBtn    = document.getElementById('showBtn');
@@ -1508,7 +1508,7 @@ function buildCards(list){
     const hasPromo=promo.length>0;
     const photoKey=(p["PHOTO"]||"").trim();
     const hasPhoto=!!photoKey;
-    const photoURL=hasPhoto?`https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png`:"";
+    const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
     const price=p[H_PRICE]||"";
     const value=p[H_VALUE]||"";
     const hoursRaw=p[H_HOURS]||"";
@@ -1547,7 +1547,7 @@ function buildCards(list){
       const name=p["FULL NAME"]||"";
       const photoKey=(p["PHOTO"]||"").trim();
       const hasPhoto=!!photoKey;
-      const photoURL=hasPhoto?`https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png`:"";
+      const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
       const dispose=p[H_DISPOSE]||"";
       const price=p[H_PRICE]||"";
       const value=p[H_VALUE]||"";
