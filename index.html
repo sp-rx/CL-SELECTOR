@@ -1039,26 +1039,41 @@ button.btn-green:hover:not(:disabled) {
         </div>
     <div style="height:12px"></div>
 
+
+
+        <div class="options">
+          <label><input type="checkbox" name="q3" value="SPH"> Short or Far Sighted (SPH)</label>
+          <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
+          <label><input type="checkbox" name="q3" value="MF"> Multi-focal (MF)</label>
+        </div>
+
+    <div style="height:12px"></div>
+
         <div class="options">
           <label><input type="checkbox" name="q1" value="CLEAR"> Clear</label>
           <label><input type="checkbox" name="q1" value="COLOUR"> Colour</label>
         </div>
 
+
+
     </div>
 
-    <div style="height:12px"></div>
 
     <div class="section">
 
       <!-- Toolbar -->
       <div class="toolbar">
         <button id="promoBtn" style="display:none;" disabled>Show Promo Only</button>
+
+
         <button id="showBtn" disabled>Loading…</button>
-<button style="background-color:lightblue; color:black" onclick="toggleDiv()">Show Filters</button>
+        <button id="resetBtn" class="btn-outline">↺ Reset</button>
+
+
+<button style="margin-left:2%; background-color:lightblue; color:black" onclick="toggleDiv()">Show Filters</button>
 
 
         <span id="btnText" style="opacity:0.6; font-size:12px;"></span>
-        <button id="resetBtn" class="btn-outline">↺ Reset</button>
       </div>
 
 
@@ -1067,7 +1082,7 @@ button.btn-green:hover:not(:disabled) {
       <!-- Q1 -->
       <!-- Q2 -->
       <!-- Q3 -->
-      <div class="section" id="q3">
+      <div style="display:none" class="section" id="q3">
         <h2>What type of prescription (RX)?
           <span id="rxToggleBtn" class="toggle-link" style="font-weight:400; font-size:11.5px; margin-left:8px;">See examples of RX types</span>
         </h2>
@@ -1086,11 +1101,7 @@ button.btn-green:hover:not(:disabled) {
           </label>
         </div>
         <div style="margin-top:10px;"></div>
-        <div class="options">
-          <label><input type="checkbox" name="q3" value="SPH"> Short or Far Sighted (SPH)</label>
-          <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
-          <label><input type="checkbox" name="q3" value="MF"> Multi-focal (MF)</label>
-        </div>
+
       </div>
 
       <!-- Q6 -->
@@ -1102,11 +1113,8 @@ button.btn-green:hover:not(:disabled) {
         </div>
       </div>
 
-        <button id="modeToggleBtn" class="btn-soft">See more filters</button>
-
-
       <!-- Q4 (pro) -->
-      <div class="section2 simple-hide" id="q4">
+      <div class="section" id="q4">
         <h2>Comfort level?</h2>
         <div class="options">
           <label><input type="checkbox" name="q4" value="BASIC"> Basic</label>
@@ -1116,13 +1124,20 @@ button.btn-green:hover:not(:disabled) {
       </div>
 
       <!-- Q5 (pro) -->
-      <div class="section2 simple-hide" id="q5">
+      <div class="section" id="q5">
         <h2>Material type?</h2>
         <div class="options">
           <label><input type="checkbox" name="q5" value="HYDROGEL"> Hydrogel (Standard Oxygen)</label>
           <label><input type="checkbox" name="q5" value="SILICONE HYDROGEL"> Silicone Hydrogel (High Oxygen)</label>
         </div>
       </div>
+
+
+
+        <button id="modeToggleBtn" style="display:none" class="btn-soft">See more filters</button>
+
+
+
 
       <!-- Converter (pro) -->
  
@@ -1495,6 +1510,10 @@ function buildCards(list){
   if(!grid) return;
   const H_DISPOSE="MODALITY (1 day, 2 weeks, 1 month, 3 months)";
   const H_PRICE="1 BOX PRICE & UNIT";
+  const H_PRICE_UNIT="PRICE 1 BOX (RM)";
+  const H_2_BOX="2 BOX";
+  const H_4_BOX="4 BOX";
+  const H_8_BOX="8 BOX";
   const H_VALUE="VALUE_PER_PAIR";
   const H_PROMO="PROMO";
   const H_COMFORT="COMFORT";
@@ -1510,6 +1529,10 @@ function buildCards(list){
     const hasPhoto=!!photoKey;
     const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
     const price=p[H_PRICE]||"";
+    const price_unit=p[H_PRICE_UNIT]||"";
+    const box2=p[H_2_BOX]||"";
+    const box4=p[H_4_BOX]||"";
+    const box8=p[H_8_BOX]||"";
     const value=p[H_VALUE]||"";
     const hoursRaw=p[H_HOURS]||"";
     const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
@@ -1529,6 +1552,24 @@ function buildCards(list){
         </div>
         <div style="font-size:12px; line-height:1.7; color:var(--text-mid);">
           <div><span style="font-weight:600;">Price:</span> ${price}</div>
+          <div>
+  <span style="font-weight:600;">Package 2 box:</span>
+  RM ${((price_unit * 2) - box2)}
+  <span style="color:green;"> ( Save RM ${box2} ) </span>
+</div>
+
+          <div>
+  <span style="font-weight:600;">Package 4 box:</span>
+  RM ${((price_unit * 4) - box4)}
+  <span style="color:green;"> ( Save RM ${box4} ) </span>
+</div>
+
+          <div>
+  <span style="font-weight:600;">Package 8 box:</span>
+  RM ${((price_unit * 8) - box8)}
+  <span style="color:green;"> ( Save RM ${box8} ) </span>
+</div>
+
           <div><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>
           <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
           <div><span style="font-weight:600;">Est. Ready:</span> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
@@ -1739,7 +1780,7 @@ return `S${fmt(sel.S)} C${fmt(sel.C)} x${sel.A}`;
 (function(){
   let isProfessional=false;
   const btn=document.getElementById('modeToggleBtn');
-  const proSelectors=['#q4','#q5'];
+  const proSelectors=['0'];
   function setMode(){
     proSelectors.forEach(sel=>{
       const el=document.querySelector(sel);
