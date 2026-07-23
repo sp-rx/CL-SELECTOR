@@ -1551,26 +1551,49 @@ function buildCards(list){
           ${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}
         </div>
         <div style="font-size:12px; line-height:1.7; color:var(--text-mid);">
-          <div><span style="font-weight:600;">Price:</span> ${price}</div>
-          <div>
-  <span style="font-weight:600;">Package 2 box:</span>
-  RM ${((price_unit * 2) - box2)}
-  <span style="color:green;"> ( Save RM ${box2} ) </span>
+          <div><span style="font-weight:600;">1 box has  ${price}</span></div>
+
+<div>
+  <span style="font-weight:600;">Price 1 box:</span>
+  <span style="font-weight:600;">
+  RM ${price_unit}
+  </span>
 </div>
 
-          <div>
-  <span style="font-weight:600;">Package 4 box:</span>
-  RM ${((price_unit * 4) - box4)}
-  <span style="color:green;"> ( Save RM ${box4} ) </span>
+<div>
+  <span style="font-weight:600;">Price 2 boxes:</span>
+  <span style="font-weight:400;">
+    RM ${price_unit * 2} ➝
+  </span>
+  <span style="font-weight:600;">
+    RM ${((price_unit * 2) - box2)}
+  </span>
+  <span style="color:green;">(Save RM ${box2})</span>
 </div>
 
-          <div>
-  <span style="font-weight:600;">Package 8 box:</span>
-  RM ${((price_unit * 8) - box8)}
-  <span style="color:green;"> ( Save RM ${box8} ) </span>
+<div>
+  <span style="font-weight:600;">Price 4 boxes:</span>
+  <span style="font-weight:400;">
+    RM ${price_unit * 4} ➝
+  </span>
+  <span style="font-weight:600;">
+    RM ${((price_unit * 4) - box4)}
+  </span>
+  <span style="color:green;">(Save RM ${box4})</span>
 </div>
 
-          <div><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>
+<div>
+  <span style="font-weight:600;">Price 8 boxes:</span>
+  <span style="font-weight:400;">
+    RM ${price_unit * 8} ➝
+  </span>
+  <span style="font-weight:600;">
+    RM ${((price_unit * 8) - box8)}
+  </span>
+  <span style="color:green;">(Save RM ${box8})</span>
+</div>
+
+          <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>
           <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
           <div><span style="font-weight:600;">Est. Ready:</span> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
         </div>
