@@ -1026,9 +1026,135 @@ button.btn-green:hover:not(:disabled) {
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
         <strong>Tip:</strong> Search by RX using format: <code style="background:var(--accent-lt); color:var(--accent); padding:1px 5px; border-radius:4px;">S-5.00 C-1.25 x180</code>
       </p>
-      <div class="search-row">
+
+
+<label>Sph</label>
+<input style="width:15%;  margin-right:2%" type="text" id="sph" placeholder="+0.00">
+
+<label>Cyl</label>
+<input style="width:15%; margin-right:2%" type="text" id="cyl" placeholder="-1.25">
+
+<label>Axis</label>
+<input style="width:15%" type="text" id="axis" placeholder="180">
+
+<button type="button" onclick="copyToEye('RE')">Enter Right Eye</button>
+<button type="button" onclick="copyToEye('LE')">Enter Left Eye</button>
+<button type="button" onclick="clearRxInputs()">✕</button>
+
+
+<script>
+function snapQuarter(input) {
+  let value = parseFloat(input.value);
+
+  if (isNaN(value)) {
+    input.value = "";
+    return;
+  }
+
+  value = Math.round(value * 4) / 4;
+
+  // Remove negative zero
+  if (Object.is(value, -0)) value = 0;
+
+  input.value = (value >= 0 ? "+" : "") + value.toFixed(2);
+}
+
+function snapAxis(input) {
+  let value = parseInt(input.value);
+
+  if (isNaN(value)) {
+    input.value = "";
+    return;
+  }
+
+  value = Math.round(value);
+
+  if (value < 1) value = 180;
+  if (value > 180) value = 180;
+
+  input.value = value;
+}
+
+document.getElementById("sph").addEventListener("blur", function () {
+  snapQuarter(this);
+});
+
+document.getElementById("cyl").addEventListener("blur", function () {
+  snapQuarter(this);
+});
+
+document.getElementById("axis").addEventListener("blur", function () {
+  snapAxis(this);
+});
+
+
+function formatPower(value) {
+  value = parseFloat(value);
+
+  if (isNaN(value)) return "0.00";
+
+  return (value >= 0 ? "+" : "") + value.toFixed(2);
+}
+
+function copyToEye(side) {
+  const sphText = document.getElementById("sph").value.trim();
+
+  // Don't enter anything if SPH is empty
+  if (sphText === "") {
+    if (side === "RE") {
+      document.getElementById("searchRE").value = "";
+    } else {
+      document.getElementById("searchLE").value = "";
+    }
+    return;
+  }
+
+  const sphValue = parseFloat(sphText);
+  const cylValue = parseFloat(document.getElementById("cyl").value) || 0;
+
+  const sph = formatPower(sphValue);
+  const cyl = formatPower(cylValue);
+
+  let axis = document.getElementById("axis").value.trim();
+  if (axis === "" || axis === "0") axis = "180";
+
+  let rx = `S${sph}`;
+
+  if (Math.abs(cylValue) > 0.001) {
+    rx += ` C${cyl} x${axis}`;
+  }
+
+  if (side === "RE") {
+    document.getElementById("searchRE").value = rx;
+  } else {
+    document.getElementById("searchLE").value = rx;
+  }
+}
+
+function clearRxInputs() {
+  document.getElementById("sph").value = "";
+  document.getElementById("cyl").value = "";
+  document.getElementById("axis").value = "";
+}
+</script>	
+
+
+      <div style="margin-top:5%" class="search-row">
         <input type="text" id="searchRE" placeholder="🔍 Search Right Eye">
+<button style="margin-right:5%" type="button" onclick="clearInput('searchRE')">✖</button>
+
         <input type="text" id="searchLE" placeholder="🔍 Search Left Eye (if needed)">
+<button type="button" onclick="clearInput('searchLE')">✖</button>
+
+<script>
+function clearInput(id) {
+  const input = document.getElementById(id);
+  input.value = "";
+  input.dispatchEvent(new Event("input")); // Optional: refreshes live search
+  input.focus(); // Optional: puts the cursor back in the input
+}
+</script>
+
       </div>
 
         <div class="options">
@@ -1298,38 +1424,57 @@ function filterProducts(selected, query){
   const vCol  = "VISION (SPH, ASTIG, MF)";
   const COMFORT_COL  = "COMFORT";
   const MATERIAL_COL = "MATERIAL";
-  const terms = (query || '').toLowerCase().split(/\s+/).filter(Boolean);
 
-  return products.filter(p => {
-    const lensType = (p[q1Col] || '').toUpperCase();
-    const modality = (p[mCol]  || '').toUpperCase();
-    const vision   = (p[vCol]  || '').toUpperCase();
-    const comfort  = (p[COMFORT_COL]  || '').toUpperCase();
-    const material = (p[MATERIAL_COL] || '').toUpperCase();
+let search = (query || '').toLowerCase();
 
-    if(selected.q1.length && !selected.q1.includes(lensType)) return false;
-    if(selected.q2.length && !selected.q2.includes(modality)) return false;
-    if(selected.q3.length && !selected.q3.includes(vision))   return false;
-    if(selected.q4.length && !selected.q4.includes(comfort))  return false;
-    if(selected.q5.length && !selected.q5.includes(material)) return false;
+// Normalize only S±0.00 to S0.00
+search = search
+  .replace(/\bs\+0\.00\b/g, "s0.00")
+  .replace(/\bs-0\.00\b/g, "s0.00");
 
-    const fullName = p["FULL NAME"] || "";
-    const isLoose  = /\bloose\b/i.test(fullName);
-    if(selected.q6.length){
-      const wantsLoose    = selected.q6.includes("LOOSE");
-      const wantsNotLoose = selected.q6.includes("NOT_LOOSE");
-      if(wantsLoose !== wantsNotLoose){
-        if(wantsLoose    && !isLoose) return false;
-        if(wantsNotLoose &&  isLoose) return false;
-      }
+const terms = search.split(/\s+/).filter(Boolean);
+
+return products.filter(p => {
+  const lensType = (p[q1Col] || '').toUpperCase();
+  const modality = (p[mCol]  || '').toUpperCase();
+  const vision   = (p[vCol]  || '').toUpperCase();
+  const comfort  = (p[COMFORT_COL]  || '').toUpperCase();
+  const material = (p[MATERIAL_COL] || '').toUpperCase();
+
+  if(selected.q1.length && !selected.q1.includes(lensType)) return false;
+  if(selected.q2.length && !selected.q2.includes(modality)) return false;
+  if(selected.q3.length && !selected.q3.includes(vision))   return false;
+  if(selected.q4.length && !selected.q4.includes(comfort))  return false;
+  if(selected.q5.length && !selected.q5.includes(material)) return false;
+
+  const fullName = p["FULL NAME"] || "";
+  const isLoose  = /\bloose\b/i.test(fullName);
+
+  if(selected.q6.length){
+    const wantsLoose    = selected.q6.includes("LOOSE");
+    const wantsNotLoose = selected.q6.includes("NOT_LOOSE");
+
+    if(wantsLoose !== wantsNotLoose){
+      if(wantsLoose && !isLoose) return false;
+      if(wantsNotLoose && isLoose) return false;
     }
-    if(terms.length){
-      const rowText = Object.values(p).join(" ").toLowerCase();
-      if(!terms.every(t => rowText.includes(t))) return false;
-    }
-    return true;
-  });
+  }
+
+  if(terms.length){
+    let rowText = Object.values(p).join(" ").toLowerCase();
+
+    // Treat S+0.00, S-0.00 and S0.00 as identical
+    rowText = rowText
+      .replace(/\bs\+0\.00\b/g, "s0.00")
+      .replace(/\bs-0\.00\b/g, "s0.00");
+
+    if(!terms.every(t => rowText.includes(t))) return false;
+  }
+
+  return true;
+});
 }
+
 
 function getNumericPrice(p){
   const text = (p["1 BOX PRICE & UNIT"] || "").replace(/,/g,"");
