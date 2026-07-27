@@ -1022,11 +1022,8 @@ button.btn-green:hover:not(:disabled) {
       </div>
 
     <div class="section" id="searchSec">
-      <div class="badge-section-label"><span>Lens Search</span></div>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
-        <strong>Tip:</strong> Search by RX using format: <code style="background:var(--accent-lt); color:var(--accent); padding:1px 5px; border-radius:4px;">S-5.00 C-1.25 x180</code>
-      </p>
-
+      <div style="margin-top:0%" class="badge-section-label"><span>Prescription Search</span></div>
+<br>
 
 <label>Sph</label>
 <input style="width:15%;  margin-right:2%" type="text" id="sph" placeholder="+0.00">
@@ -1037,8 +1034,8 @@ button.btn-green:hover:not(:disabled) {
 <label>Axis</label>
 <input style="width:15%" type="text" id="axis" placeholder="180">
 
-<button type="button" onclick="copyToEye('RE')">Enter Right Eye</button>
-<button type="button" onclick="copyToEye('LE')">Enter Left Eye</button>
+<button style="margin-left:2%" type="button" onclick="copyToEye('RE')">Enter RE</button>
+<button type="button" onclick="copyToEye('LE')">Enter LE</button>
 <button type="button" onclick="clearRxInputs()">✕</button>
 
 
@@ -1138,8 +1135,9 @@ function clearRxInputs() {
 }
 </script>	
 
+      <div style="margin-top:5%" class="badge-section-label"><span>Lens Search</span></div>
 
-      <div style="margin-top:5%" class="search-row">
+      <div style="margin-top:0%" class="search-row">
         <input type="text" id="searchRE" placeholder="🔍 Search Right Eye">
 <button style="margin-right:5%" type="button" onclick="clearInput('searchRE')">✖</button>
 
