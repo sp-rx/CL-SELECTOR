@@ -1034,12 +1034,13 @@ button.btn-green:hover:not(:disabled) {
 <label>Axis</label>
 <input style="width:15%" type="text" id="axis" placeholder="180">
 
-<button style="margin-left:2%" type="button" onclick="copyToEye('RE')">Enter RE</button>
-<button type="button" onclick="copyToEye('LE')">Enter LE</button>
+<button style="margin-left:2%" type="button" onclick="copyToEye('RE')">Enter to RE</button>
+<button type="button" onclick="copyToEye('LE')">Enter to LE</button>
 <button type="button" onclick="clearRxInputs()">✕</button>
 
 
 <script>
+
 function snapQuarter(input) {
   let value = parseFloat(input.value);
 
@@ -1056,17 +1057,42 @@ function snapQuarter(input) {
   input.value = (value >= 0 ? "+" : "") + value.toFixed(2);
 }
 
-function snapAxis(input) {
-  let value = parseInt(input.value);
+function snapCyl(input) {
+  let value = parseFloat(input.value);
 
   if (isNaN(value)) {
     input.value = "";
     return;
   }
 
-  value = Math.round(value);
+  // Allowed cylinder values
+  const allowedCyl = [-0.75, -1.25, -1.75, -2.25];
 
-  if (value < 1) value = 180;
+  // Find the nearest allowed cylinder
+  let nearest = allowedCyl[0];
+
+  for (const cyl of allowedCyl) {
+    if (Math.abs(value - cyl) < Math.abs(value - nearest)) {
+      nearest = cyl;
+    }
+  }
+
+  input.value = nearest.toFixed(2);
+}
+
+function snapAxis(input) {
+  let value = parseFloat(input.value);
+
+  if (isNaN(value)) {
+    input.value = "";
+    return;
+  }
+
+  // Round to nearest 10
+  value = Math.round(value / 10) * 10;
+
+  // Keep axis between 10 and 180
+  if (value < 10) value = 180;
   if (value > 180) value = 180;
 
   input.value = value;
@@ -1077,13 +1103,12 @@ document.getElementById("sph").addEventListener("blur", function () {
 });
 
 document.getElementById("cyl").addEventListener("blur", function () {
-  snapQuarter(this);
+  snapCyl(this);
 });
 
 document.getElementById("axis").addEventListener("blur", function () {
   snapAxis(this);
 });
-
 
 function formatPower(value) {
   value = parseFloat(value);
@@ -1134,7 +1159,7 @@ function clearRxInputs() {
   document.getElementById("axis").value = "";
 }
 </script>	
-
+<br>
       <div style="margin-top:5%" class="badge-section-label"><span>Lens Search</span></div>
 
       <div style="margin-top:0%" class="search-row">
