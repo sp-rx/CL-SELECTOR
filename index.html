@@ -1781,6 +1781,10 @@ function buildCards(list){
       const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
       const dispose=p[H_DISPOSE]||"";
       const price=p[H_PRICE]||"";
+    const price_unit=p[H_PRICE_UNIT]||"";
+    const box2=p[H_2_BOX]||"";
+    const box4=p[H_4_BOX]||"";
+    const box8=p[H_8_BOX]||"";
       const value=p[H_VALUE]||"";
       const comfort=p[H_COMFORT]||"";
       const material=p[H_MAT]||"";
@@ -1803,8 +1807,61 @@ function buildCards(list){
             }
           </div>
           <div class="details">
+
+
+
+
+
             <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--text); margin-bottom:6px;">${name}</div>
-            <div><b>Dispose Period:</b> ${dispose}</div>
+            <div><b>Current Promo:</b> <span style="color:${hasPromo?'var(--danger)':'var(--text-muted)'}">${hasPromo?promo:"Not at the moment"}</span></div>
+
+
+
+            <div><b>1 box has </b> ${price}</div>
+
+
+<div>
+  <span style="font-weight:600;">--- <br> 1 box</span>
+  <span style="font-weight:600;">
+  RM ${price_unit}
+  </span>
+</div>
+
+<div>
+  <span style="font-weight:600;">2 boxes</span>
+
+  <span style="font-weight:600;">
+    RM ${((price_unit * 2) - box2)}
+  </span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box2 / 2} per box
+(RM ${Math.round(price_unit - (box2 / 2))})</span>
+</div>
+
+<div>
+  <span style="font-weight:600;">4 boxes</span>
+
+  <span style="font-weight:600;">
+    RM ${((price_unit * 4) - box4)}
+  </span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box4 / 4} per box
+(RM ${Math.round(price_unit - (box4 / 4))})
+</span>
+</div>
+
+<div>
+  <span style="font-weight:600;">8 boxes</span>
+
+  <span style="font-weight:600;">
+    RM ${((price_unit * 8) - box8)}
+  </span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box8 / 8} per box
+(RM ${Math.round(price_unit - (box8 / 8))})
+</span>
+</div>
+
+
+
+
             <div><b>Estimated Ready:</b> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
             <div class="def-row">
               <b class="def-term" data-long="<strong>Premium:</strong> Enhanced coating &amp; comfort through newer and premium technology.<br><strong>Good:</strong> Medium range balancing cost and technology.<br><strong>Basic:</strong> Focuses on health and safety only.">Comfort</b>: <span>${comfortNice}</span>
@@ -1815,10 +1872,7 @@ function buildCards(list){
               <div class="def-extra"></div>
             </div>
             <div><b>Estimated wearing hours:</b> ${hours||"—"}</div>
-            <div><b>Average cost per pair:</b> ${value||"—"}</div>
             <hr style="border:none;border-top:1px solid var(--border);margin:8px 0;">
-            <div><b>Price Per Pack & Qty:</b> ${price}</div>
-            <div><b>Current Promo:</b> <span style="color:${hasPromo?'var(--danger)':'var(--text-muted)'}">${hasPromo?promo:"Not at the moment"}</span></div>
           </div>
         </div>`;
 
@@ -2016,40 +2070,209 @@ function toggleCompare(cardEl,product,btn){
     if(selectedCards.length>=2) return;
     selectedCards.push(product);
     cardEl.style.outline="2px solid var(--accent)";
-    btn.textContent="Remove";
+    btn.textContent="Compare";
   }
   updateCompareView();
 }
-function updateCompareView(){
-  const compBox=document.getElementById("compareBox")||createCompareBox();
-  if(selectedCards.length!==2){ compBox.style.display="none"; return; }
-  const [a,b]=selectedCards;
-  const priceA=a["1 BOX PRICE & UNIT"]||"—";
-  const priceB=b["1 BOX PRICE & UNIT"]||"—";
-  const hrsA=a["WEARING_HOURS"]?`${parseFloat(a["WEARING_HOURS"])} hrs`:"—";
-  const hrsB=b["WEARING_HOURS"]?`${parseFloat(b["WEARING_HOURS"])} hrs`:"—";
-  const typeA=a["VISION (SPH, ASTIG, MF)"]||"—";
-  const typeB=b["VISION (SPH, ASTIG, MF)"]||"—";
-  const isLooseA=/\bloose\b/i.test(a["FULL NAME"]||"");
-  const isLooseB=/\bloose\b/i.test(b["FULL NAME"]||"");
-  const leadA=parseInt(a["LEAD_TIME"]||"3",10);
-  const leadB=parseInt(b["LEAD_TIME"]||"3",10);
-  const etaA=computeETA(leadA,{looseStart:isLooseA}).text;
-  const etaB=computeETA(leadB,{looseStart:isLooseB}).text;
-  compBox.innerHTML=`
-    <h3 style="margin:0 0 12px; font-family:var(--font-display);">Comparison</h3>
-    <table>
-      <tr><th>Field</th><th>${a["FULL NAME"]}</th><th>${b["FULL NAME"]}</th></tr>
-      <tr><td><b>Price</b></td><td>${priceA}</td><td>${priceB}</td></tr>
-      <tr><td><b>Wearing Hours</b></td><td>${hrsA}</td><td>${hrsB}</td></tr>
-      <tr><td><b>Est. Ready</b></td><td>${etaA}</td><td>${etaB}</td></tr>
-      <tr><td><b>Type</b></td><td>${typeA}</td><td>${typeB}</td></tr>
-    </table>
-    <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px;">
-      Click <strong>Remove</strong> on either lens to clear comparison.
-    </p>`;
-  compBox.style.display="block";
+
+
+
+
+function getExpandedCardHTML(p){
+  const H_DISPOSE="MODALITY (1 day, 2 weeks, 1 month, 3 months)";
+  const H_PRICE="1 BOX PRICE & UNIT";
+  const H_VALUE="VALUE_PER_PAIR";
+  const H_PROMO="PROMO";
+  const H_COMFORT="COMFORT";
+  const H_MAT="MATERIAL";
+  const H_HOURS="WEARING_HOURS";
+const H_PRICE_UNIT = "PRICE 1 BOX (RM)";
+const H_2_BOX = "2 BOX";
+const H_4_BOX = "4 BOX";
+const H_8_BOX = "8 BOX";
+
+  const name=p["FULL NAME"]||"";
+  const photoKey=(p["PHOTO"]||"").trim();
+  const hasPhoto=!!photoKey;
+  const photoURL=hasPhoto
+    ? `https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`
+    : "";
+
+  const dispose=p[H_DISPOSE]||"";
+  const price=p[H_PRICE]||"";
+    const price_unit=p[H_PRICE_UNIT]||"";
+    const box2=p[H_2_BOX]||"";
+    const box4=p[H_4_BOX]||"";
+    const box8=p[H_8_BOX]||"";
+  const value=p[H_VALUE]||"";
+  const comfort=p[H_COMFORT]||"";
+  const material=p[H_MAT]||"";
+  const promo=(p[H_PROMO]||"").trim();
+  const hasPromo=promo.length>0;
+  const hoursRaw=p[H_HOURS]||"";
+  const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
+
+  const comfortNice=niceCase(comfort);
+  const materialNice=mapMaterial(material);
+
+  const isLoose=/\bloose\b/i.test(name);
+  const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
+  const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
+
+  return `
+    <div class="zoom-card-flex">
+      <div class="photo" style="text-align:center;">
+        ${
+          hasPhoto
+          ? `<img src="${photoURL}" alt="${name}">`
+          : `<div style="height:200px;display:flex;align-items:center;justify-content:center;border:1px dashed #ccc;">No photo</div>`
+        }
+      </div>
+
+      <div class="details">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;">
+          ${name}
+        </div>
+        <div>1 box has  ${price}</div>
+
+
+<div>
+  <span style="font-weight:600;">--- <br> 1 box</span>
+  <span style="font-weight:600;">
+  RM ${price_unit}
+  </span>
+</div>
+
+<div>
+  <span style="font-weight:600;">2 boxes</span>
+
+  <span style="font-weight:600;">
+    RM ${((price_unit * 2) - box2)}
+  </span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box2 / 2} per box
+(RM ${Math.round(price_unit - (box2 / 2))})</span>
+</div>
+
+<div>
+  <span style="font-weight:600;">4 boxes</span>
+
+  <span style="font-weight:600;">
+    RM ${((price_unit * 4) - box4)}
+  </span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box4 / 4} per box
+(RM ${Math.round(price_unit - (box4 / 4))})
+</span>
+</div>
+
+<div>
+  <span style="font-weight:600;">8 boxes</span>
+
+  <span style="font-weight:600;">
+    RM ${((price_unit * 8) - box8)}
+  </span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box8 / 8} per box
+(RM ${Math.round(price_unit - (box8 / 8))})
+</span>
+</div>
+
+
+
+        <div><b>Estimated Ready:</b> ${etaText}</div>
+        <div><b>Comfort:</b> ${comfortNice}</div>
+        <div><b>Material:</b> ${materialNice}</div>
+        <div><b>Wearing Hours:</b> ${hours||"—"}</div>
+
+        <hr>
+
+
+        <div>
+          <b>Promo:</b>
+          <span style="color:${hasPromo?'red':'#777'};">
+            ${hasPromo?promo:"No promotion"}
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
 }
+
+
+
+
+function removeCompare(index) {
+  selectedCards.splice(index, 1);
+  updateCompareView();
+}
+
+function updateCompareView() {
+
+  const compBox = document.getElementById("compareBox") || createCompareBox();
+
+  // Hide only when nothing is selected
+  if (selectedCards.length === 0) {
+    compBox.style.display = "none";
+    return;
+  }
+
+  compBox.innerHTML = `
+    <h2 style="margin-bottom:20px;text-align:center;">
+      Lens Comparison
+    </h2>
+
+    <div style="
+      display:grid;
+      grid-template-columns:repeat(2,minmax(350px,1fr));
+      gap:24px;
+      align-items:start;
+    ">
+
+      ${
+        selectedCards[0] ? `
+        <div class="pane">
+          ${getExpandedCardHTML(selectedCards[0])}
+
+          <div style="margin-top:10px;text-align:left;">
+            <button
+              class="btn-outline"
+              onclick="removeCompare(0)">
+              Remove
+            </button>
+          </div>
+        </div>
+        ` : ""
+      }
+
+      ${
+        selectedCards[1] ? `
+        <div class="pane">
+          ${getExpandedCardHTML(selectedCards[1])}
+
+          <div style="margin-top:10px;text-align:left;">
+            <button
+              class="btn-outline"
+              onclick="removeCompare(1)">
+              Remove
+            </button>
+          </div>
+        </div>
+        ` : ""
+      }
+
+    </div>
+
+    <p style="
+      text-align:center;
+      margin-top:18px;
+      font-size:12px;
+      color:#777;
+    ">
+      Click <b>Remove</b> to remove a lens from comparison.
+    </p>
+  `;
+
+  compBox.style.display = "block";
+}
+
 function createCompareBox(){
   const box=document.createElement("div");
   box.id="compareBox";
