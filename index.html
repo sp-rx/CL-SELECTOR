@@ -1722,37 +1722,42 @@ function buildCards(list){
           <div><span style="font-weight:600;">1 box has  ${price}</span></div>
 
 <div>
-  <span style="font-weight:600;">Price 1 box:</span>
+  <span style="font-weight:600;">--- <br> 1 box</span>
   <span style="font-weight:600;">
   RM ${price_unit}
   </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">Price 2 boxes:</span>
+  <span style="font-weight:600;">2 boxes</span>
 
   <span style="font-weight:600;">
     RM ${((price_unit * 2) - box2)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box2}</span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box2 / 2} per box
+(RM ${Math.round(price_unit - (box2 / 2))})</span>
 </div>
 
 <div>
-  <span style="font-weight:600;">Price 4 boxes:</span>
+  <span style="font-weight:600;">4 boxes</span>
 
   <span style="font-weight:600;">
     RM ${((price_unit * 4) - box4)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box4}</span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box4 / 4} per box
+(RM ${Math.round(price_unit - (box4 / 4))})
+</span>
 </div>
 
 <div>
-  <span style="font-weight:600;">Price 8 boxes:</span>
+  <span style="font-weight:600;">8 boxes</span>
 
   <span style="font-weight:600;">
     RM ${((price_unit * 8) - box8)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box8}</span>
+  <span style="font-weight:600;color:#3A6656;">- Save RM ${box8 / 8} per box
+(RM ${Math.round(price_unit - (box8 / 8))})
+</span>
 </div>
 
           <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>
