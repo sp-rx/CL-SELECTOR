@@ -657,7 +657,7 @@ button.btn-green:hover:not(:disabled) {
    COMPARE BOX
 ============================================================ */
 #compareBox {
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 16px;
@@ -1673,6 +1673,7 @@ function renderCards(data){
   buildCards(clean);
 }
 
+
 function buildCards(list){
   const grid=document.getElementById("cardsGrid");
   if(!grid) return;
@@ -1687,6 +1688,8 @@ function buildCards(list){
   const H_COMFORT="COMFORT";
   const H_MAT="MATERIAL";
   const H_HOURS="WEARING_HOURS";
+  const H_SUPPLY="SUPPLY";
+
 
   const html=list.map((p,idx)=>{
     const id="card_"+idx;
@@ -1698,6 +1701,8 @@ function buildCards(list){
     const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
     const price=p[H_PRICE]||"";
     const price_unit=p[H_PRICE_UNIT]||"";
+    const supply=p[H_SUPPLY]||"";
+
     const box2=p[H_2_BOX]||"";
     const box4=p[H_4_BOX]||"";
     const box8=p[H_8_BOX]||"";
@@ -1719,46 +1724,60 @@ function buildCards(list){
           ${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}
         </div>
         <div style="font-size:12px; line-height:1.7; color:var(--text-mid);">
-          <div><span style="font-weight:600;">1 pack has  ${price}</span></div>
+          <div><span style="font-weight:600;">1 PK (pack) has ${price}</span></div>
 
 <div>
-  <span style="font-weight:600;">--- <br> 1 box</span>
   <span style="font-weight:600;">
-  RM ${price_unit}
+    --- <br> ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
+  </span>
+
+  <span style="font-weight:600;">
+   = 1 PK @ RM ${price_unit} , -
   </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">2 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 2) - box2)}
+    = 2 PK @ RM ${((price_unit * 2) - box2)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box2 / 2} per box
-(RM ${Math.round(price_unit - (box2 / 2))})</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box2 / 2))} / PK
+  </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">4 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 4) - box4)}
+   = 4 PK @ RM ${((price_unit * 4) - box4)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box4 / 4} per box
-(RM ${Math.round(price_unit - (box4 / 4))})
-</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box4 / 4))} / PK
+  </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">8 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 8) - box8)}
+    = 8 PK @ RM ${((price_unit * 8) - box8)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box8 / 8} per box
-(RM ${Math.round(price_unit - (box8 / 8))})
-</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box8 / 8))} / PK
+  </span>
 </div>
+
 
           <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>
           <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
@@ -1786,6 +1805,10 @@ function buildCards(list){
     const box4=p[H_4_BOX]||"";
     const box8=p[H_8_BOX]||"";
       const value=p[H_VALUE]||"";
+      const supply=p[H_SUPPLY]||"";
+
+
+
       const comfort=p[H_COMFORT]||"";
       const material=p[H_MAT]||"";
       const promo=(p[H_PROMO]||"").trim();
@@ -1817,46 +1840,59 @@ function buildCards(list){
 
 
 
-            <div><b>1 box has </b> ${price}</div>
+            <div><b>1 PK (pack) has </b> ${price}</div>
 
 
 <div>
-  <span style="font-weight:600;">--- <br> 1 box</span>
   <span style="font-weight:600;">
-  RM ${price_unit}
+    --- <br> ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
+  </span>
+
+  <span style="font-weight:600;">
+   = 1 PK @ RM ${price_unit} , -
   </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">2 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 2) - box2)}
+    = 2 PK @ RM ${((price_unit * 2) - box2)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box2 / 2} per box
-(RM ${Math.round(price_unit - (box2 / 2))})</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box2 / 2))} / PK
+  </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">4 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 4) - box4)}
+   = 4 PK @ RM ${((price_unit * 4) - box4)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box4 / 4} per box
-(RM ${Math.round(price_unit - (box4 / 4))})
-</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box4 / 4))} / PK
+  </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">8 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 8) - box8)}
+    = 8 PK @ RM ${((price_unit * 8) - box8)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box8 / 8} per box
-(RM ${Math.round(price_unit - (box8 / 8))})
-</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box8 / 8))} / PK
+  </span>
 </div>
 
 
@@ -2090,6 +2126,8 @@ const H_PRICE_UNIT = "PRICE 1 BOX (RM)";
 const H_2_BOX = "2 BOX";
 const H_4_BOX = "4 BOX";
 const H_8_BOX = "8 BOX";
+  const H_SUPPLY="SUPPLY";
+
 
   const name=p["FULL NAME"]||"";
   const photoKey=(p["PHOTO"]||"").trim();
@@ -2106,6 +2144,7 @@ const H_8_BOX = "8 BOX";
     const box8=p[H_8_BOX]||"";
   const value=p[H_VALUE]||"";
   const comfort=p[H_COMFORT]||"";
+  const supply=p[H_SUPPLY]||"";
   const material=p[H_MAT]||"";
   const promo=(p[H_PROMO]||"").trim();
   const hasPromo=promo.length>0;
@@ -2133,46 +2172,59 @@ const H_8_BOX = "8 BOX";
         <div style="font-size:12px;font-weight:600;margin-bottom:8px;">
           ${name}
         </div>
-        <div>1 box has  ${price}</div>
+        <div>1 PK (pack) has ${price}</div>
 
 
 <div>
-  <span style="font-weight:600;">--- <br> 1 box</span>
   <span style="font-weight:600;">
-  RM ${price_unit}
+    --- <br> ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
+  </span>
+
+  <span style="font-weight:600;">
+   = 1 PK @ RM ${price_unit} , -
   </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">2 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 2) - box2)}
+    = 2 PK @ RM ${((price_unit * 2) - box2)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box2 / 2} per box
-(RM ${Math.round(price_unit - (box2 / 2))})</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box2 / 2))} / PK
+  </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">4 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 4) - box4)}
+   = 4 PK @ RM ${((price_unit * 4) - box4)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box4 / 4} per box
-(RM ${Math.round(price_unit - (box4 / 4))})
-</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box4 / 4))} / PK
+  </span>
 </div>
 
 <div>
-  <span style="font-weight:600;">8 boxes</span>
+  <span style="font-weight:600;">
+    ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
+  </span>
 
   <span style="font-weight:600;">
-    RM ${((price_unit * 8) - box8)}
+    = 8 PK @ RM ${((price_unit * 8) - box8)}
   </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box8 / 8} per box
-(RM ${Math.round(price_unit - (box8 / 8))})
-</span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box8 / 8))} / PK
+  </span>
 </div>
 
 
@@ -2215,6 +2267,7 @@ function updateCompareView() {
   }
 
   compBox.innerHTML = `
+
     <h2 style="margin-bottom:20px;text-align:center;">
       Lens Comparison
     </h2>
