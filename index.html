@@ -658,7 +658,7 @@ button.btn-green:hover:not(:disabled) {
 ============================================================ */
 #compareBox {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   border-radius: var(--radius-lg);
   padding: 16px;
   margin: 16px 0;
@@ -1221,6 +1221,12 @@ function clearInput(id) {
 
 <button style="margin-left:2%; background-color:lightblue; color:black" onclick="toggleDiv()">Show Filters</button>
 
+        <select style="display:none" id="sortSelect">
+          <option value="price-asc">Price Low → High</option>
+          <option value="price-desc">Price High → Low</option>
+          <option value="hours-desc">Wearing Hours Long → Short</option>
+          <option value="hours-asc">Wearing Hours Short → Long</option>
+        </select>
 
         <span id="btnText" style="opacity:0.6; font-size:12px;"></span>
       </div>
@@ -1308,19 +1314,12 @@ function toggleDiv3() {
 
 </script>
 </div>
+<div style="display:none">
       <!-- Sort bar -->
       <div id="sortBar" style="display:none;">
         <strong style="color:var(--text-mid);">Sort:</strong>
-        <select id="sortSelect">
-          <option value="price-asc">Price Low → High</option>
-          <option value="price-desc">Price High → Low</option>
-          <option value="valuepair-asc">Value/Pair Low → High</option>
-          <option value="valuepair-desc">Value/Pair High → Low</option>
-          <option value="comfort-desc">Comfort Premium → Basic</option>
-          <option value="comfort-asc">Comfort Basic → Premium</option>
-          <option value="hours-desc">Wearing Hours Long → Short</option>
-          <option value="hours-asc">Wearing Hours Short → Long</option>
-        </select>
+ 
+      </div>
       </div>
 
     </div><!-- end section -->
@@ -1728,21 +1727,21 @@ function buildCards(list){
 
 <div>
   <span style="font-weight:600;">
-    --- <br> ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
+    --- <br> 1 PK = ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-   = 1 PK @ RM ${price_unit} , -
+   = RM ${price_unit} , -
   </span>
 </div>
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
+    2 PK = ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-    = 2 PK @ RM ${((price_unit * 2) - box2)}
+    = RM ${((price_unit * 2) - box2)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
@@ -1752,11 +1751,11 @@ function buildCards(list){
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
+    4 PK = ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-   = 4 PK @ RM ${((price_unit * 4) - box4)}
+   = RM ${((price_unit * 4) - box4)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
@@ -1766,11 +1765,11 @@ function buildCards(list){
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
+    8 PK = ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-    = 8 PK @ RM ${((price_unit * 8) - box8)}
+    = RM ${((price_unit * 8) - box8)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
@@ -1779,7 +1778,7 @@ function buildCards(list){
 </div>
 
 
-          <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>
+          <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>---<br>
           <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
           <div><span style="font-weight:600;">Est. Ready:</span> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
         </div>
@@ -1842,24 +1841,23 @@ function buildCards(list){
 
             <div><b>1 PK (pack) has </b> ${price}</div>
 
-
 <div>
   <span style="font-weight:600;">
-    --- <br> ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
+    --- <br> 1 PK = ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-   = 1 PK @ RM ${price_unit} , -
+   = RM ${price_unit} , -
   </span>
 </div>
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
+    2 PK = ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-    = 2 PK @ RM ${((price_unit * 2) - box2)}
+    = RM ${((price_unit * 2) - box2)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
@@ -1869,11 +1867,11 @@ function buildCards(list){
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
+    4 PK = ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-   = 4 PK @ RM ${((price_unit * 4) - box4)}
+   = RM ${((price_unit * 4) - box4)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
@@ -1883,19 +1881,17 @@ function buildCards(list){
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
+    8 PK = ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-    = 8 PK @ RM ${((price_unit * 8) - box8)}
+    = RM ${((price_unit * 8) - box8)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
     , RM ${Math.round(price_unit - (box8 / 8))} / PK
   </span>
 </div>
-
-
 
 
             <div><b>Estimated Ready:</b> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
@@ -2105,7 +2101,7 @@ function toggleCompare(cardEl,product,btn){
   } else {
     if(selectedCards.length>=2) return;
     selectedCards.push(product);
-    cardEl.style.outline="2px solid var(--accent)";
+    cardEl.style.outline="";
     btn.textContent="Compare";
   }
   updateCompareView();
@@ -2174,24 +2170,23 @@ const H_8_BOX = "8 BOX";
         </div>
         <div>1 PK (pack) has ${price}</div>
 
-
 <div>
   <span style="font-weight:600;">
-    --- <br> ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
+    --- <br> 1 PK = ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-   = 1 PK @ RM ${price_unit} , -
+   = RM ${price_unit} , -
   </span>
 </div>
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
+    2 PK = ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-    = 2 PK @ RM ${((price_unit * 2) - box2)}
+    = RM ${((price_unit * 2) - box2)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
@@ -2201,11 +2196,11 @@ const H_8_BOX = "8 BOX";
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
+    4 PK = ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-   = 4 PK @ RM ${((price_unit * 4) - box4)}
+   = RM ${((price_unit * 4) - box4)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
@@ -2215,18 +2210,17 @@ const H_8_BOX = "8 BOX";
 
 <div>
   <span style="font-weight:600;">
-    ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
+    8 PK = ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
   </span>
 
   <span style="font-weight:600;">
-    = 8 PK @ RM ${((price_unit * 8) - box8)}
+    = RM ${((price_unit * 8) - box8)}
   </span>
 
   <span style="font-weight:600;color:#3A6656;">
     , RM ${Math.round(price_unit - (box8 / 8))} / PK
   </span>
 </div>
-
 
 
         <div><b>Estimated Ready:</b> ${etaText}</div>
