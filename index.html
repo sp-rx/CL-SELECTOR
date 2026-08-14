@@ -413,12 +413,15 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .card-compact .photo img {
-  width: 100%;
-  max-width: 100%;
-  height: auto;
+  width: 300px;
+  height: 200px;
+  background-color:white;
+  object-fit: contain;
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  cursor: default;
+  display: block;
+  margin: 0 auto;
 }
 
 /* ============================================================
@@ -487,9 +490,11 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .zoom-card-flex .photo img {
-  width: 100%;
-  max-width: 600px;
-  height: auto;
+  width: 300px;
+  height: 200px;
+  background-color:white;
+  object-fit: contain;
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
   display: block;
@@ -1180,6 +1185,15 @@ function clearInput(id) {
 
       </div>
 
+
+        <div class="options">
+          <label><input type="checkbox" name="q4" value="ALCON"> Alcon</label>
+          <label><input type="checkbox" name="q4" value="BIONICS"> Bionics</label>
+          <label><input type="checkbox" name="q4" value="JOHNSON & JOHNSON"> Acuvue</label>
+        </div>
+    <div style="height:12px"></div>
+
+
         <div class="options">
           <label><input type="checkbox" name="q2" value="1 Day"> 1 Day</label>
           <label><input type="checkbox" name="q2" value="2 Weeks"> 2 Weeks</label>
@@ -1271,11 +1285,7 @@ function clearInput(id) {
       <!-- Q4 (pro) -->
       <div class="section" id="q4">
         <h2>Comfort level?</h2>
-        <div class="options">
-          <label><input type="checkbox" name="q4" value="BASIC"> Basic</label>
-          <label><input type="checkbox" name="q4" value="GOOD"> Good</label>
-          <label><input type="checkbox" name="q4" value="PREMIUM"> Premium</label>
-        </div>
+
       </div>
 
       <!-- Q5 (pro) -->
@@ -1444,7 +1454,7 @@ function filterProducts(selected, query){
   const q1Col = "LENS TYPE (CLEAR, COLOUR)";
   const mCol  = "MODALITY (1 Day, 2 Weeks, 1 Month, 3 Months)";
   const vCol  = "VISION (SPH, ASTIG, MF)";
-  const COMFORT_COL  = "COMFORT";
+  const BRAND_COL  = "BRAND";
   const MATERIAL_COL = "MATERIAL";
 
 let search = (query || '').toLowerCase();
@@ -1460,13 +1470,13 @@ return products.filter(p => {
   const lensType = (p[q1Col] || '').toUpperCase();
   const modality = (p[mCol]  || '').toUpperCase();
   const vision   = (p[vCol]  || '').toUpperCase();
-  const comfort  = (p[COMFORT_COL]  || '').toUpperCase();
+  const brand  = (p[BRAND_COL]  || '').toUpperCase();
   const material = (p[MATERIAL_COL] || '').toUpperCase();
 
   if(selected.q1.length && !selected.q1.includes(lensType)) return false;
   if(selected.q2.length && !selected.q2.includes(modality)) return false;
   if(selected.q3.length && !selected.q3.includes(vision))   return false;
-  if(selected.q4.length && !selected.q4.includes(comfort))  return false;
+  if(selected.q4.length && !selected.q4.includes(brand))  return false;
   if(selected.q5.length && !selected.q5.includes(material)) return false;
 
   const fullName = p["FULL NAME"] || "";
@@ -1701,7 +1711,7 @@ function buildCards(list){
     const price=p[H_PRICE]||"";
     const price_unit=p[H_PRICE_UNIT]||"";
     const supply=p[H_SUPPLY]||"";
-
+    const mat=p[H_MAT]||"";
     const box2=p[H_2_BOX]||"";
     const box4=p[H_4_BOX]||"";
     const box8=p[H_8_BOX]||"";
@@ -1714,16 +1724,16 @@ function buildCards(list){
 
     return `
       <div id="${id}" class="pane lens-card card-compact" style="position:relative;">
-        <div style="font-weight:600; font-size:13px; color:var(--text); margin-bottom:8px;">${name}</div>
+        <div style="font-weight:600; font-size:13px; color:var(--text); margin-bottom:8px;">${name} (${mat})</div>
         <div class="photo" style="margin-bottom:8px;">
           ${hasPhoto
             ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
             : `<div style="width:100%;height:100px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);font-size:12px;">No photo</div>`
           }
-          ${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}
+         <div style="height:45px"> ${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}</div>
         </div>
         <div style="font-size:12px; line-height:1.7; color:var(--text-mid);">
-          <div><span style="font-weight:600;">1 PK (pack) has ${price}</span></div>
+          <div><span style="font-weight:600;">1 PK (pack) has ${price} ${mat} lenses.</span></div>
 
 <div>
   <span style="font-weight:600;">
