@@ -275,7 +275,7 @@ textarea {
 ============================================================ */
 button {
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   background: var(--accent);
   color: #fff;
@@ -1171,11 +1171,12 @@ function clearRxInputs() {
       <div class="badge-section-label" style="margin-top:3%"><span>Lens Search</span></div>
 
       <div style="margin-top:0%" class="search-row">
-        <input type="text" id="searchRE" placeholder="🔍 Search Right Eye">
-<button style="margin-right:5%" type="button" onclick="clearInput('searchRE')">✖</button>
+        <input type="text" id="searchRE" placeholder="Search Right Eye">
+<button class="btn-outline" style="margin-right:5%; height:30px" type="button" onclick="clearInput('searchRE')">✖</button>
 
-        <input type="text" id="searchLE" placeholder="🔍 Search Left Eye (if needed)">
-<button type="button" onclick="clearInput('searchLE')">✖</button>
+
+        <input type="text" id="searchLE" placeholder=" Search Left Eye (if needed)">
+<button class="btn-outline" style="height:30px;" type="button" onclick="clearInput('searchLE')">✖</button>
 
 <script>
 function clearInput(id) {
