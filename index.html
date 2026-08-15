@@ -1047,6 +1047,26 @@ button.btn-green:hover:not(:disabled) {
 <button type="button" onclick="copyToEye('LE')">Enter to LE</button>
 <button type="button" onclick="clearRxInputs()">✕</button>
 
+	<br>
+      <div class="badge-section-label" style="margin-top:3%"><span>Lens Search</span></div>
+
+      <div style="margin-top:0%" >
+        <input style="width:40%" type="text" id="searchRE" placeholder="Search Right Eye">
+<button style="margin-right:3%" type="button" onclick="clearInput('searchRE')">✕</button>
+
+
+        <input style="width:40%" type="text" id="searchLE" placeholder=" Search Left Eye (if needed)">
+<button type="button" onclick="clearInput('searchLE')">✕</button>
+
+<script>
+function clearInput(id) {
+  const input = document.getElementById(id);
+  input.value = "";
+  input.dispatchEvent(new Event("input")); // Optional: refreshes live search
+  input.focus(); // Optional: puts the cursor back in the input
+}
+</script>
+
 <script>
 
 function snapQuarter(input) {
@@ -1165,25 +1185,6 @@ function clearRxInputs() {
   document.getElementById("sph").value = "";
   document.getElementById("cyl").value = "";
   document.getElementById("axis").value = "";
-}
-</script>	
-<br>
-      <div class="badge-section-label" style="margin-top:3%"><span>Lens Search</span></div>
-
-      <div style="margin-top:0%" class="search-row">
-        <input type="text" id="searchRE" placeholder="Search Right Eye">
-<button class="btn-outline" style="margin-right:5%; height:30px" type="button" onclick="clearInput('searchRE')">✖</button>
-
-
-        <input type="text" id="searchLE" placeholder=" Search Left Eye (if needed)">
-<button class="btn-outline" style="height:30px;" type="button" onclick="clearInput('searchLE')">✖</button>
-
-<script>
-function clearInput(id) {
-  const input = document.getElementById(id);
-  input.value = "";
-  input.dispatchEvent(new Event("input")); // Optional: refreshes live search
-  input.focus(); // Optional: puts the cursor back in the input
 }
 </script>
 
