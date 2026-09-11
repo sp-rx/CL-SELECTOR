@@ -1795,77 +1795,89 @@ function buildCards(list){
 
           <div>
             <span style="font-weight:600;">
-              1 PK (pack) has ${price} ${mat} lenses.
+              1 pack has ${price} ${mat} lenses.
             </span>
           </div>
 
 
-          <!-- PK1 -->
-          <div>
-            <span style="font-weight:600;">
-              ${pk1} PK = ${supply * pk1} days or
-              ${Math.round((supply * pk1 / 30) * 10) / 10} months
-            </span>
+             <!-- PK1 -->
+<div>
+  <span style="font-weight:600;">
+   - ${pk1} pack =
+  </span>
 
-            <span style="font-weight:600;">
-              = RM ${Math.round(price_unit * pk1)}
-            </span>
+  <span style="font-weight:600;">
+    RM ${Math.round(price_unit * pk1)}
+  </span>
 
-            <span style="font-weight:600;color:#3A6656;">
-              , RM ${Math.round(price_unit)} / PK
-            </span>
-          </div>
-
-
-          <!-- PK2 -->
-          <div>
-            <span style="font-weight:600;">
-              ${pk2} PK = ${supply * pk2} days or
-              ${Math.round((supply * pk2 / 30) * 10) / 10} months
-            </span>
-
-            <span style="font-weight:600;">
-              = RM ${Math.round((price_unit * pk2) - box2)}
-            </span>
-
-            <span style="font-weight:600;color:#3A6656;">
-              , RM ${Math.round(price_unit - (box2 / pk2))} / PK
-            </span>
-          </div>
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk1} days or
+    ${Math.round((supply * pk1 / 30) * 10) / 10} months
+  </span>
+</div>
 
 
-          <!-- PK3 -->
-          <div>
-            <span style="font-weight:600;">
-              ${pk3} PK = ${supply * pk3} days or
-              ${Math.round((supply * pk3 / 30) * 10) / 10} months
-            </span>
+<!-- PK2 -->
+<div>
+  <span style="font-weight:600;">
+    - - ${pk2} pack =
+  </span>
 
-            <span style="font-weight:600;">
-              = RM ${Math.round((price_unit * pk3) - box4)}
-            </span>
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk2) - box2)}
+  </span>
 
-            <span style="font-weight:600;color:#3A6656;">
-              , RM ${Math.round(price_unit - (box4 / pk3))} / PK
-            </span>
-          </div>
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box2 / pk2))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk2} days or
+    ${Math.round((supply * pk2 / 30) * 10) / 10} months
+  </span>
+</div>
 
 
-          <!-- PK4 -->
-          <div>
-            <span style="font-weight:600;">
-              ${pk4} PK = ${supply * pk4} days or
-              ${Math.round((supply * pk4 / 30) * 10) / 10} months
-            </span>
+<!-- PK3 -->
+<div>
+  <span style="font-weight:600;">
+   - - -  ${pk3} pack =
+  </span>
 
-            <span style="font-weight:600;">
-              = RM ${Math.round((price_unit * pk4) - box8)}
-            </span>
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk3) - box4)}
+  </span>
 
-            <span style="font-weight:600;color:#3A6656;">
-              , RM ${Math.round(price_unit - (box8 / pk4))} / PK
-            </span>
-          </div>
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box4 / pk3))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk3} days or
+    ${Math.round((supply * pk3 / 30) * 10) / 10} months
+  </span>
+</div>
+
+
+<!-- PK4 -->
+<div>
+  <span style="font-weight:600;">
+   - - - -  ${pk4} pack =
+  </span>
+
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk4) - box8)}
+  </span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box8 / pk4))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk4} days or
+    ${Math.round((supply * pk4 / 30) * 10) / 10} months
+  </span>
+</div>
 
           <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>---<br>
           <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
@@ -1952,76 +1964,88 @@ list.forEach((p,idx)=>{
           </div>
 
           <div>
-            <b>1 PK (pack) has </b> ${price}
+            <b>1 pack has </b> ${price}
           </div>
 
 
-          <!-- PK1 -->
-          <div>
-            <span style="font-weight:600;">
-              ${pk1} PK = ${supply * pk1} days or
-              ${Math.round((supply * pk1 / 30) * 10) / 10} months
-            </span>
+           <!-- PK1 -->
+<div>
+  <span style="font-weight:600;">
+   - ${pk1} pack =
+  </span>
 
-            <span style="font-weight:600;">
-              = RM ${Math.round(price_unit * pk1)}
-            </span>
+  <span style="font-weight:600;">
+    RM ${Math.round(price_unit * pk1)}
+  </span>
 
-            <span style="font-weight:600;color:#3A6656;">
-              , RM ${Math.round(price_unit)} / PK
-            </span>
-          </div>
-
-
-          <!-- PK2 -->
-          <div>
-            <span style="font-weight:600;">
-              ${pk2} PK = ${supply * pk2} days or
-              ${Math.round((supply * pk2 / 30) * 10) / 10} months
-            </span>
-
-            <span style="font-weight:600;">
-              = RM ${Math.round((price_unit * pk2) - box2)}
-            </span>
-
-            <span style="font-weight:600;color:#3A6656;">
-              , RM ${Math.round(price_unit - (box2 / pk2))} / PK
-            </span>
-          </div>
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk1} days or
+    ${Math.round((supply * pk1 / 30) * 10) / 10} months
+  </span>
+</div>
 
 
-          <!-- PK3 -->
-          <div>
-            <span style="font-weight:600;">
-              ${pk3} PK = ${supply * pk3} days or
-              ${Math.round((supply * pk3 / 30) * 10) / 10} months
-            </span>
+<!-- PK2 -->
+<div>
+  <span style="font-weight:600;">
+    - - ${pk2} pack =
+  </span>
 
-            <span style="font-weight:600;">
-              = RM ${Math.round((price_unit * pk3) - box4)}
-            </span>
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk2) - box2)}
+  </span>
 
-            <span style="font-weight:600;color:#3A6656;">
-              , RM ${Math.round(price_unit - (box4 / pk3))} / PK
-            </span>
-          </div>
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box2 / pk2))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk2} days or
+    ${Math.round((supply * pk2 / 30) * 10) / 10} months
+  </span>
+</div>
 
 
-          <!-- PK4 -->
-          <div>
-            <span style="font-weight:600;">
-              ${pk4} PK = ${supply * pk4} days or
-              ${Math.round((supply * pk4 / 30) * 10) / 10} months
-            </span>
+<!-- PK3 -->
+<div>
+  <span style="font-weight:600;">
+   - - -  ${pk3} pack =
+  </span>
 
-            <span style="font-weight:600;">
-              = RM ${Math.round((price_unit * pk4) - box8)}
-            </span>
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk3) - box4)}
+  </span>
 
-            <span style="font-weight:600;color:#3A6656;">
-              , RM ${Math.round(price_unit - (box8 / pk4))} / PK
-            </span>
-          </div>
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box4 / pk3))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk3} days or
+    ${Math.round((supply * pk3 / 30) * 10) / 10} months
+  </span>
+</div>
+
+
+<!-- PK4 -->
+<div>
+  <span style="font-weight:600;">
+   - - - -  ${pk4} pack =
+  </span>
+
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk4) - box8)}
+  </span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box8 / pk4))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk4} days or
+    ${Math.round((supply * pk4 / 30) * 10) / 10} months
+  </span>
+</div>
 
 
             <div><b>Estimated Ready:</b> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
@@ -2347,73 +2371,88 @@ function getExpandedCardHTML(p){
         </div>
 
         <div>
-          1 PK (pack) has ${price}
+          1 pack has ${price}
         </div>
 
 
-        <!-- PK1 -->
-        <div>
-          <span style="font-weight:600;">
-            --- <br>
-            ${pk1} PK = ${supply * pk1} days or
-            ${Math.round((supply * pk1 / 30) * 10) / 10} months
-          </span>
+   <!-- PK1 -->
+<div>
+  <span style="font-weight:600;">
+   - ${pk1} pack =
+  </span>
 
-          <span style="font-weight:600;">
-            = RM ${Math.round(price_unit * pk1)} , -
-          </span>
-        </div>
+  <span style="font-weight:600;">
+    RM ${Math.round(price_unit * pk1)}
+  </span>
 
-
-        <!-- PK2 -->
-        <div>
-          <span style="font-weight:600;">
-            ${pk2} PK = ${supply * pk2} days or
-            ${Math.round((supply * pk2 / 30) * 10) / 10} months
-          </span>
-
-          <span style="font-weight:600;">
-            = RM ${Math.round((price_unit * pk2) - box2)}
-          </span>
-
-          <span style="font-weight:600;color:#3A6656;">
-            , RM ${Math.round(price_unit - (box2 / pk2))} / PK
-          </span>
-        </div>
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk1} days or
+    ${Math.round((supply * pk1 / 30) * 10) / 10} months
+  </span>
+</div>
 
 
-        <!-- PK3 -->
-        <div>
-          <span style="font-weight:600;">
-            ${pk3} PK = ${supply * pk3} days or
-            ${Math.round((supply * pk3 / 30) * 10) / 10} months
-          </span>
+<!-- PK2 -->
+<div>
+  <span style="font-weight:600;">
+    - - ${pk2} pack =
+  </span>
 
-          <span style="font-weight:600;">
-            = RM ${Math.round((price_unit * pk3) - box4)}
-          </span>
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk2) - box2)}
+  </span>
 
-          <span style="font-weight:600;color:#3A6656;">
-            , RM ${Math.round(price_unit - (box4 / pk3))} / PK
-          </span>
-        </div>
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box2 / pk2))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk2} days or
+    ${Math.round((supply * pk2 / 30) * 10) / 10} months
+  </span>
+</div>
 
 
-        <!-- PK4 -->
-        <div>
-          <span style="font-weight:600;">
-            ${pk4} PK = ${supply * pk4} days or
-            ${Math.round((supply * pk4 / 30) * 10) / 10} months
-          </span>
+<!-- PK3 -->
+<div>
+  <span style="font-weight:600;">
+   - - -  ${pk3} pack =
+  </span>
 
-          <span style="font-weight:600;">
-            = RM ${Math.round((price_unit * pk4) - box8)}
-          </span>
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk3) - box4)}
+  </span>
 
-          <span style="font-weight:600;color:#3A6656;">
-            , RM ${Math.round(price_unit - (box8 / pk4))} / PK
-          </span>
-        </div>
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box4 / pk3))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk3} days or
+    ${Math.round((supply * pk3 / 30) * 10) / 10} months
+  </span>
+</div>
+
+
+<!-- PK4 -->
+<div>
+  <span style="font-weight:600;">
+   - - - -  ${pk4} pack =
+  </span>
+
+  <span style="font-weight:600;">
+    RM ${Math.round((price_unit * pk4) - box8)}
+  </span>
+
+  <span style="font-weight:600;color:#3A6656;">
+    , RM ${Math.round(price_unit - (box8 / pk4))} each
+  </span>
+
+  <span style="font-weight:600; color:#a1a1a1;">
+    , ${supply * pk4} days or
+    ${Math.round((supply * pk4 / 30) * 10) / 10} months
+  </span>
+</div>
 
 
         <div><b>Estimated Ready:</b> ${etaText}</div>
