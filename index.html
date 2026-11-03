@@ -835,6 +835,7 @@ button.btn-green:hover:not(:disabled) {
         </div>
       </div>
 
+
       <script>
       (function(){
         const btn = document.getElementById("presetToggleBtn");
@@ -1243,7 +1244,44 @@ function clearRxInputs() {
         <button id="showBtn" disabled>Loading…</button>
 	<button onclick="toggleAllLensDetails(this)">  Show Details </button>
 	<button style="margin-left:2%" id="resetBtn" class="btn-outline">↺ Reset</button>
+<button onclick="toggleAlconQR()" style="
+  background:#B94A3A;
+  color:white;
+  border:none;
+  padding:8px 16px;
+  border-radius:6px;
+  cursor:pointer;
+">
+  Show Alcon QR
+</button>
 
+<div id="alconQRPrompt" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  z-index:99999;
+  justify-content:center;
+  align-items:center;
+"
+onclick="this.style.display='none'">
+
+  <img
+    src="https://sp-rx.github.io/CL-SELECTOR/alcon_qr.png"
+    style="max-width:90%; max-height:85%; object-fit:contain; background:white; padding:10px; border-radius:10px;"
+    onclick="event.stopPropagation()"
+  >
+
+</div>
+
+<script>
+function toggleAlconQR() {
+  const prompt = document.getElementById("alconQRPrompt");
+
+  prompt.style.display =
+    prompt.style.display === "flex" ? "none" : "flex";
+}
+</script>
 
 <button style="display:none; margin-left:2%; background-color:lightblue; color:black" onclick="toggleDiv()">Show Filters</button>
 
@@ -2337,6 +2375,9 @@ function getExpandedCardHTML(p){
 
   const promo = (p[H_PROMO] || "").trim();
   const hasPromo = promo.length > 0;
+const promoHTML = promo === "ALCON QR"
+  ? '<span onclick="showAlconQR()">ALCON QR</span>'
+  : promo;
 
   const hoursRaw = p[H_HOURS] || "";
   const hours = hoursRaw ? `${parseFloat(hoursRaw)} hrs` : "";
