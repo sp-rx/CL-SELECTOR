@@ -1837,7 +1837,8 @@ function buildCards(list){
             </span>
           </div>
 
-
+<div class="section2" style="padding:5px 10px 5px 10px">
+<span><b>Buy More Save More</b></span>
              <!-- PK1 -->
 <div>
   <span style="font-weight:600;">
@@ -1862,7 +1863,7 @@ function buildCards(list){
 <!-- PK2 -->
 <div>
   <span style="font-weight:600;">
-    - - ${pk2} pack =
+    - ${pk2} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -1883,7 +1884,7 @@ function buildCards(list){
 <!-- PK3 -->
 <div>
   <span style="font-weight:600;">
-   - - -  ${pk3} pack =
+   - ${pk3} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -1904,7 +1905,7 @@ function buildCards(list){
 <!-- PK4 -->
 <div>
   <span style="font-weight:600;">
-   - - - -  ${pk4} pack =
+   - ${pk4} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -1920,10 +1921,10 @@ function buildCards(list){
     ${Math.round((supply * pk4 / 30) * 10) / 10} months
   </span>
 </div>
-
+</div>
           <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>---<br>
           <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
-          <div><span style="font-weight:600;">Est. Ready:</span> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
+          <div><span style="font-weight:600;">Est. Ready:</span> ${etaText}<em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
         </div>
       </div>`;
   }).join("");
@@ -1994,23 +1995,23 @@ list.forEach((p,idx)=>{
 
         <div class="details">
 
-          <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--text); margin-bottom:6px;">
+          <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--text); margin-bottom:-12px;">
             ${name}
           </div>
 
-          <div>
-            <b>Current Promo:</b>
-            <span style="color:${hasPromo?'var(--danger)':'var(--text-muted)'}">
-              ${hasPromo?promo:"Not at the moment"}
-            </span>
-          </div>
-
-          <div>
+           <div>
             <b>1 pack has </b> ${price}
           </div>
 
+    <div style="margin-top:-12px; margin-bottom:-8px">
+            <span style="color:${hasPromo?'var(--danger)':'var(--text-muted)'}">
+              ${hasPromo?promo:""}
+            </span>
+          </div>
 
            <!-- PK1 -->
+<div class="section2" style="padding:5px 10px 5px 10px">
+<span><b>Buy More Save More</b></span>
 <div>
   <span style="font-weight:600;">
    - ${pk1} pack =
@@ -2034,7 +2035,7 @@ list.forEach((p,idx)=>{
 <!-- PK2 -->
 <div>
   <span style="font-weight:600;">
-    - - ${pk2} pack =
+    - ${pk2} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -2055,7 +2056,7 @@ list.forEach((p,idx)=>{
 <!-- PK3 -->
 <div>
   <span style="font-weight:600;">
-   - - -  ${pk3} pack =
+   - ${pk3} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -2076,7 +2077,7 @@ list.forEach((p,idx)=>{
 <!-- PK4 -->
 <div>
   <span style="font-weight:600;">
-   - - - -  ${pk4} pack =
+   - ${pk4} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -2092,9 +2093,9 @@ list.forEach((p,idx)=>{
     ${Math.round((supply * pk4 / 30) * 10) / 10} months
   </span>
 </div>
+</div>
 
-
-            <div><b>Estimated Ready:</b> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
+            <div><b>Estimated Ready:</b> ${etaText}<em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
             <div class="def-row">
               <b class="def-term" data-long="<strong>Premium:</strong> Enhanced coating &amp; comfort through newer and premium technology.<br><strong>Good:</strong> Medium range balancing cost and technology.<br><strong>Basic:</strong> Focuses on health and safety only.">Comfort</b>: <span>${comfortNice}</span>
               <div class="def-extra"></div>
@@ -2423,7 +2424,8 @@ const promoHTML = promo === "ALCON QR"
           1 pack has ${price}
         </div>
 
-
+<div class="section2" style="padding:5px 10px 5px 10px">
+<span><b>Buy More Save More</b></span>
    <!-- PK1 -->
 <div>
   <span style="font-weight:600;">
@@ -2448,7 +2450,7 @@ const promoHTML = promo === "ALCON QR"
 <!-- PK2 -->
 <div>
   <span style="font-weight:600;">
-    - - ${pk2} pack =
+    - ${pk2} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -2469,7 +2471,7 @@ const promoHTML = promo === "ALCON QR"
 <!-- PK3 -->
 <div>
   <span style="font-weight:600;">
-   - - -  ${pk3} pack =
+   - ${pk3} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -2490,7 +2492,7 @@ const promoHTML = promo === "ALCON QR"
 <!-- PK4 -->
 <div>
   <span style="font-weight:600;">
-   - - - -  ${pk4} pack =
+   - ${pk4} pack =
   </span>
 
   <span style="font-weight:600;">
@@ -2506,7 +2508,7 @@ const promoHTML = promo === "ALCON QR"
     ${Math.round((supply * pk4 / 30) * 10) / 10} months
   </span>
 </div>
-
+</div>
 
         <div><b>Estimated Ready:</b> ${etaText}</div>
         <div><b>Comfort:</b> ${comfortNice}</div>
