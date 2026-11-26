@@ -1157,6 +1157,8 @@ function copyToEye(side) {
     } else {
       document.getElementById("searchLE").value = "";
     }
+    autoRefresh(true);          // <-- add
+
     return;
   }
 
@@ -1180,6 +1182,8 @@ function copyToEye(side) {
   } else {
     document.getElementById("searchLE").value = rx;
   }
+    autoRefresh(true);          // <-- add
+
 }
 
 function clearRxInputs() {
@@ -1242,6 +1246,7 @@ function clearRxInputs() {
 
 
         <button id="showBtn" disabled>Loading…</button>
+<button id="manualSearchBtn" style="display:none" disabled>🔍 Search</button>
 	<button onclick="toggleAllLensDetails(this)">  Show Details </button>
 	<button style="margin-left:2%" id="resetBtn" class="btn-outline">↺ Reset</button>
 <button onclick="toggleAlconQR()" style="
@@ -1486,7 +1491,8 @@ fetch(csvUrl, {cache:'no-store'})
     const {headers, rows} = parseCSV(text);
     products = rows.map(r => { const o = {}; headers.forEach((h,i) => o[h] = (r[i] ?? '').trim()); return o; });
     csvLoaded = true;
-    if(showBtn){ showBtn.disabled = false; showBtn.textContent = 'Show Results'; }
+    updateModeUI();
+autoRefresh(true);   // show all items on page load
     if(promoBtn){ promoBtn.disabled = false; promoBtn.textContent = 'Show Promo Only'; }
     if(btnText){ btnText.textContent = ''; }
   })
@@ -1706,7 +1712,46 @@ function showResults(){
   el&&el.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); showResults(); } });
 });
 
-showBtn?.addEventListener("click",()=>{ promoOnlyMode=false; showResults(); });
+/* ---------- Auto / Manual search mode ---------- */
+let autoMode = true;
+let autoTimer = null;
+const manualBtn = document.getElementById('manualSearchBtn');
+
+function updateModeUI(){
+  if(!csvLoaded) return;
+  showBtn.disabled = false;
+  showBtn.textContent = autoMode ? 'Auto-search' : 'Manual-search';
+  if(manualBtn){
+    manualBtn.style.display = autoMode ? 'none' : '';
+    manualBtn.disabled = false;
+  }
+}
+
+function autoRefresh(immediate){
+  if(!autoMode || !csvLoaded) return;
+  clearTimeout(autoTimer);
+  const run = () => { promoOnlyMode = false; showResults(); };
+  if(immediate) run();
+  else autoTimer = setTimeout(run, 200);   // small debounce while typing
+}
+
+// Button toggles the mode
+showBtn?.addEventListener("click", () => {
+  autoMode = !autoMode;
+  updateModeUI();
+  if(autoMode) autoRefresh(true);
+});
+
+// Manual mode: search only when this is pressed (or Enter in a search box)
+manualBtn?.addEventListener("click", () => { promoOnlyMode = false; showResults(); });
+
+// Auto mode triggers
+["searchRE","searchLE"].forEach(id => {
+  document.getElementById(id)?.addEventListener("input", () => autoRefresh());
+});
+document.addEventListener("change", e => {
+  if(e.target.matches('input[type="checkbox"]')) autoRefresh();
+});
 promoBtn?.addEventListener("click",()=>{ promoOnlyMode=true; showResults(); });
 
 sortSelect?.addEventListener("change",()=>{
@@ -2263,6 +2308,7 @@ if(Math.abs(sel.C) === 0.25)
 return `S${fmt(sel.S)} C${fmt(sel.C)} x${sel.A}`;
   };
     reBox.value=f(latest.re); leBox.value=f(latest.le);
+autoRefresh(true);              // <-- add
   }
 
   document.getElementById("auto1").addEventListener("click",()=>autofillSet("t1"));
@@ -2617,6 +2663,8 @@ function createCompareBox(){
 const oldBuildCards=buildCards;
 buildCards=function(list){
   oldBuildCards(list);
+  const showDetails = document.querySelector('button[onclick^="toggleAllLensDetails"]')
+                        ?.textContent.trim() === "Hide Details";
   list.forEach((p,idx)=>{
     const card=document.getElementById("card_"+idx);
     if(!card) return;
@@ -2625,9 +2673,11 @@ buildCards=function(list){
     btn.className="btn-outline lens-detail-control";
     btn.style.marginTop="8px";
     btn.style.fontSize="11px";
-    btn.style.display="none";
+    btn.style.display = showDetails ? "" : "none";
     btn.addEventListener("click",(e)=>{ e.stopPropagation(); toggleCompare(card,p,btn); });
     card.appendChild(btn);
+    const det = document.getElementById("details-card_"+idx);
+    if(det) det.style.display = showDetails ? "" : "none";
   });
 };
 </script>
